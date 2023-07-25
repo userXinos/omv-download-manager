@@ -1,4 +1,4 @@
-import { RestApiResponse, BaseRequest, get, SessionName } from "./shared";
+import { RestApiResponse, BaseRequest, post, SessionName } from "./shared";
 
 const CGI_NAME = "auth";
 const API_NAME = "SYNO.API.Auth";
@@ -13,35 +13,50 @@ export interface AuthLoginRequest extends BaseRequest {
 }
 
 export interface AuthLoginResponse {
-  sid: string;
+  authenticated: boolean;
+  permissions: { role: 'admin'|'user' };
+  username: string
 }
 
 export interface AuthLogoutRequest extends BaseRequest {
-  sid: string;
   session: SessionName;
+  params: null;
 }
 
 function Login(
   baseUrl: string,
   options: AuthLoginRequest,
 ): Promise<RestApiResponse<AuthLoginResponse>> {
-  return get(baseUrl, CGI_NAME, {
+  return post(baseUrl, CGI_NAME, {
     ...options,
     api: API_NAME,
-    method: "login",
     format: "sid",
+
+    method: "login",
+    service: 'session',
+    params: {
+      username: options.account,
+      password: options.passwd,
+    },
     meta: {
       apiGroup: "Auth",
     },
-  });
+  })
+      .then((res: RestApiResponse<object>) => {
+        res.success = (res.data as AuthLoginResponse).authenticated;
+        return res as RestApiResponse<AuthLoginResponse>;
+      });
 }
 
 function Logout(baseUrl: string, options: AuthLogoutRequest): Promise<RestApiResponse<{}>> {
-  return get(baseUrl, CGI_NAME, {
+  return post(baseUrl, CGI_NAME, {
     ...options,
     api: API_NAME,
     version: 1,
+
     method: "logout",
+    service: 'session',
+    params: null,
     meta: {
       apiGroup: "Auth",
     },

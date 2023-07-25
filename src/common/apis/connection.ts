@@ -3,7 +3,7 @@ import { ClientRequestResult, SessionName, SynologyClient } from "./synology";
 
 export async function testConnection(
   settings: ConnectionSettings,
-): Promise<ClientRequestResult<{}>> {
+) {
   const api = new SynologyClient({
     baseUrl: getHostUrl(settings),
     account: settings.username,
@@ -12,7 +12,7 @@ export async function testConnection(
   });
 
   const loginResult = await api.Auth.Login({ timeout: 30000 });
-  if (!ClientRequestResult.isConnectionFailure(loginResult) && loginResult.success) {
+  if (!ClientRequestResult.isConnectionFailure(loginResult) && loginResult.data.authenticated) {
     // Note that this is fire-and-forget.
     api.Auth.Logout({ timeout: 10000 }).then((logoutResponse) => {
       if (logoutResponse === "not-logged-in") {

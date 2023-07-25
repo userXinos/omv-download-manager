@@ -8,7 +8,7 @@ export * from "./migrations/latest";
 
 export function getHostUrl(settings: ConnectionSettings) {
   if (settings.hostname && settings.port) {
-    return `https://${settings.hostname}:${settings.port}`;
+    return `http://${settings.hostname}:${settings.port}`;
   } else {
     return undefined;
   }

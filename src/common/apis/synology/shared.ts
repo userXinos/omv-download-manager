@@ -21,6 +21,11 @@ export interface FormFile {
   filename: string;
 }
 
+export interface Params {
+  username: string;
+  password: string
+}
+
 export function isFormFile(f?: any): f is FormFile {
   return f && (f as FormFile).content != null && (f as FormFile).filename != null;
 }
@@ -44,6 +49,7 @@ export interface RestApiSuccessResponse<S> {
 export interface RestApiFailureResponse {
   success: false;
   meta: ResponseMeta;
+  data: Record<string, unknown>;
   error: {
     code: number;
     errors?: any[];
@@ -63,7 +69,8 @@ export interface ApiRequest {
   meta: ApiGroupMeta;
   sid?: string;
   timeout?: number;
-  [key: string]: string | number | boolean | FormFile | ApiGroupMeta | undefined;
+  params: Params | null;
+  [key: string]: string | number | boolean | null | FormFile | ApiGroupMeta | Params | undefined;
 }
 
 const DEFAULT_TIMEOUT = 60000;
@@ -82,14 +89,14 @@ async function fetchWithErrorHandling(
   try {
     const response = await fetch(url, {
       ...init,
-      credentials: "omit",
+      credentials: "same-origin",
       signal: abortController.signal,
     });
     if (!response.ok) {
       throw new BadResponseError(response);
     } else {
       return {
-        ...(await response.json()),
+        data: {...(await response.json()).response},
         meta,
       };
     }
@@ -129,30 +136,14 @@ export async function post<O extends object>(
   cgi: string,
   request: ApiRequest,
 ): Promise<RestApiResponse<O>> {
-  const formData = new FormData();
+  const url = `${baseUrl}/rpc.php`;
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  const bodyEntries = Object.entries(request).filter(([k, v]) => (
+      k !== "timeout" && k !== "meta" && v !== undefined && !isFormFile(v)
+  ));
+  const body = JSON.stringify(Object.fromEntries(bodyEntries));
 
-  Object.keys(request).forEach((k) => {
-    const v = request[k];
-    if (k !== "timeout" && k !== "meta" && v !== undefined && !isFormFile(v)) {
-      // String() !== new String(). This produces lowercase-s strings, not capital-S Strings.
-      formData.append(k, String(v));
-    }
-  });
-
-  if (request.sid) {
-    formData.append("_sid", request.sid);
-  }
-
-  Object.keys(request).forEach((k) => {
-    const v = request[k];
-    if (k !== "timeout" && k !== "meta" && v !== undefined && isFormFile(v)) {
-      formData.append(k, v.content, v.filename);
-    }
-  });
-
-  const url = `${baseUrl}/webapi/${cgi}.cgi?${stringify({ _sid: request.sid })}`;
-
-  return fetchWithErrorHandling(url, { method: "POST", body: formData }, request.timeout, {
+  return fetchWithErrorHandling(url, { method: "POST", headers, body }, request.timeout, {
     ...request.meta,
     ...typesafePick(request, "method", "version"),
   }) as Promise<RestApiResponse<O>>;
@@ -219,6 +210,7 @@ export class ApiBuilder {
         method: methodName,
         sid,
         meta: this.meta,
+        params: null,
       });
       if (response.success) {
         return { ...response, data: postprocess!(response.data) };
