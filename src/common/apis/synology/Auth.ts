@@ -1,4 +1,5 @@
 import { RestApiResponse, BaseRequest, post, SessionName } from "./shared";
+import { deleteAllCookies } from '../../deleteAllCookies';
 
 const CGI_NAME = "auth";
 const API_NAME = "SYNO.API.Auth";
@@ -42,7 +43,7 @@ function Login(
       apiGroup: "Auth",
     },
   })
-      .then((res: RestApiResponse<object>) => {
+      .then((res) => {
         res.success = (res.data as AuthLoginResponse).authenticated;
         return res as RestApiResponse<AuthLoginResponse>;
       });
@@ -60,7 +61,11 @@ function Logout(baseUrl: string, options: AuthLogoutRequest): Promise<RestApiRes
     meta: {
       apiGroup: "Auth",
     },
-  });
+  })
+      .then((res) => {
+        deleteAllCookies();
+        return res as RestApiResponse<{}>
+      })
 }
 
 export const Auth = {

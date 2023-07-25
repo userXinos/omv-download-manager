@@ -56,8 +56,8 @@ export class Popup extends React.PureComponent<Props, State> {
 
   render() {
     const completedTaskIds = this.props.tasks
-      .filter((t) => t.status === "finished")
-      .map((t) => t.id);
+      .filter((t) => !t.downloading && t.filesize > 0)
+      .map((t) => t.uuid);
     const onClickClearTasks = this.props.client
       ? async () => {
           this.setState({ isClearingCompletedTasks: true });
@@ -189,7 +189,7 @@ export class Popup extends React.PureComponent<Props, State> {
             <ul>
               {sortTasks(filteredTasks, this.props.taskSort).map((task) => (
                 <Task
-                  key={task.id}
+                  key={task.uuid}
                   task={task}
                   onDelete={deleteTask}
                   onPause={this.props.client?.pauseTask}

@@ -22,8 +22,7 @@ export interface FormFile {
 }
 
 export interface Params {
-  username: string;
-  password: string
+  [p: string]: unknown;
 }
 
 export function isFormFile(f?: any): f is FormFile {
@@ -63,7 +62,7 @@ export interface BaseRequest {
 }
 
 export interface ApiRequest {
-  api: string;
+  service: string;
   version: number;
   method: string;
   meta: ApiGroupMeta;
@@ -93,10 +92,14 @@ async function fetchWithErrorHandling(
       signal: abortController.signal,
     });
     if (!response.ok) {
+      console.log(JSON.parse(init.body));
       throw new BadResponseError(response);
     } else {
+      const rrr = await response.json();
+      console.log(JSON.parse(init.body), rrr);
       return {
-        data: {...(await response.json()).response},
+        success: true,
+        data: {...(rrr).response},
         meta,
       };
     }
@@ -175,11 +178,13 @@ export class ApiBuilder {
 
   makePost<I extends BaseRequest, O>(
     methodName: string,
+    params: Params,
     preprocess?: (options: I) => object,
     postprocess?: (response: O) => O,
   ): (baseUrl: string, sid: string, options: I) => Promise<RestApiResponse<O>>;
   makePost<I extends BaseRequest, O>(
     methodName: string,
+    params: Params,
     preprocess: ((options?: I) => object) | undefined,
     postprocess: ((response: O) => O) | undefined,
     optional: true,
@@ -187,16 +192,18 @@ export class ApiBuilder {
 
   makePost(
     methodName: string,
+    params: Params,
     preprocess?: (options: object) => object,
     postprocess?: (response: object) => object,
     _optional?: true,
   ) {
-    return this.makeApiRequest(post, methodName, preprocess, postprocess);
+    return this.makeApiRequest(post, methodName, params, preprocess, postprocess);
   }
 
   private makeApiRequest(
     method: typeof get | typeof post,
     methodName: string,
+    params: Params,
     preprocess?: (options: object) => object,
     postprocess?: (response: object) => object,
   ) {
@@ -205,12 +212,12 @@ export class ApiBuilder {
     return async (baseUrl: string, sid: string, options?: object) => {
       const response = await method(baseUrl, this.cgiName, {
         ...preprocess!(options || {}),
-        api: this.apiName,
+        service: this.apiName,
         version: 1,
         method: methodName,
+        params,
         sid,
         meta: this.meta,
-        params: null,
       });
       if (response.success) {
         return { ...response, data: postprocess!(response.data) };

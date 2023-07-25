@@ -117,27 +117,19 @@ export const ALL_TASK_ERROR_STATUSES = Object.keys(
 ) as DownloadStationTaskErrorStatus[];
 
 export interface DownloadStationTask {
-  id: string;
-  // The docs have these properly cased, but I'm pretty sure they all end up on the wire lowercased.
-  type: "bt" | "nzb" | "http" | "ftp" | "emule";
-  username: string;
-  title: string;
-  size: number;
-  status: DownloadStationTaskNormalStatus;
-  status_extra?: {
-    error_detail: DownloadStationTaskErrorStatus;
-    unzip_progress?: number;
-  };
-  // It's unclear to me if the values of these keys are a function of the type of task.
-  // I also don't know what the optionality of these are -- it's not documented, so this is
-  // guesswork from experimental results.
-  additional?: {
-    detail?: DownloadStationTaskDetail;
-    file?: DownloadStationTaskFile[];
-    peer?: DownloadStationTaskPeer[];
-    tracker?: DownloadStationTaskTracker[];
-    transfer?: DownloadStationTaskTransfer;
-  };
+  uuid: string;
+  filename: string;
+  url: string;
+  dltype: 'aria2'|'curl'|'youtube-dl';
+  downloading: boolean;
+  filesize: number;
+  parts: number;
+  format: string; // ???
+  keepvideo: string; // ???
+  subtitles: boolean;
+  sharedfoldername: string;
+  sharedfolderref: string;
+  delete: boolean;
 }
 
 export interface DownloadStationTaskGetInfoRequest extends BaseRequest {
@@ -178,7 +170,7 @@ export interface DownloadStationTaskEditRequest extends BaseRequest {
 }
 
 const CGI_NAME = "DownloadStation/task";
-const API_NAME = "SYNO.DownloadStation.Task";
+const API_NAME = "Downloader";
 
 const taskBuilder = new ApiBuilder(CGI_NAME, API_NAME, {
   apiGroup: "DownloadStation",
@@ -279,13 +271,14 @@ function fixTaskNumericTypes(task: DownloadStationTask): DownloadStationTask {
 
 export const Task = {
   API_NAME,
-  List: taskBuilder.makeGet<DownloadStationTaskListRequest, DownloadStationTaskListResponse>(
-    "list",
+  List: taskBuilder.makePost<DownloadStationTaskListRequest, DownloadStationTaskListResponse>(
+    "getDownloadList",
+    { limit: -1, start: 0 },
     (o) => ({
       ...o,
       additional: o?.additional?.length ? o.additional.join(",") : undefined,
     }),
-    (r) => ({ ...r, tasks: (r.tasks || []).map(fixTaskNumericTypes) }),
+    (r) => ({ ...r, tasks: r.data }),
     true,
   ),
   GetInfo: taskBuilder.makeGet<

@@ -49,7 +49,8 @@ const TASK_FILTER_TO_TYPES: Record<
 };
 
 export function matchesFilter(task: DownloadStationTask, filterName: keyof VisibleTaskSettings) {
-  return TASK_FILTER_TO_TYPES[filterName].indexOf(task.status) !== -1;
+  const status = task.downloading ? 'downloading' : (task.filesize > 0)  ? 'finished' : 'waiting';
+  return TASK_FILTER_TO_TYPES[filterName].indexOf(status) !== -1;
 }
 
 export function filterTasks(
@@ -69,12 +70,12 @@ export function filterTasks(
 }
 
 function isActive(task: DownloadStationTask) {
-  return task.additional!.transfer!.speed_upload > 0 || task.additional!.transfer!.speed_download;
+  return task.downloading;
 }
 
-function fractionComplete(task: DownloadStationTask) {
-  return task.additional!.transfer!.size_downloaded / task.size;
-}
+// function fractionComplete(task: DownloadStationTask) {
+//   return task.additional!.transfer!.size_downloaded / task.size;
+// }
 
 export function sortTasks(
   tasks: DownloadStationTask[],
@@ -82,19 +83,23 @@ export function sortTasks(
 ): DownloadStationTask[] {
   switch (taskSortType) {
     case "name-asc":
-      return sortBy(tasks, (t) => t.title.toLocaleLowerCase());
+      return sortBy(tasks, (t) => t.filename.toLocaleLowerCase());
 
     case "name-desc":
-      return sortBy(tasks, (t) => t.title.toLocaleLowerCase()).reverse();
+      return sortBy(tasks, (t) => t.filename.toLocaleLowerCase()).reverse();
 
     case "timestamp-completed-asc": {
       const [completed, incomplete] = partition(
         tasks,
         (t) => matchesFilter(t, "completed") || matchesFilter(t, "uploading"),
       );
+      // return [
+      //   ...sortBy(incomplete, (t) => -fractionComplete(t)),
+      //   ...sortBy(completed, (t) => t.additional!.detail!.completed_time),
+      // ];
       return [
-        ...sortBy(incomplete, (t) => -fractionComplete(t)),
-        ...sortBy(completed, (t) => t.additional!.detail!.completed_time),
+        ...sortBy(incomplete, (t) => t),
+        ...sortBy(completed, (t) => t),
       ];
     }
 
@@ -103,23 +108,27 @@ export function sortTasks(
         tasks,
         (t) => matchesFilter(t, "completed") || matchesFilter(t, "uploading"),
       );
+      // return [
+      //   ...sortBy(incomplete, (t) => -fractionComplete(t)),
+      //   ...sortBy(completed, (t) => -t.additional!.detail!.completed_time),
+      // ];
       return [
-        ...sortBy(incomplete, (t) => -fractionComplete(t)),
-        ...sortBy(completed, (t) => -t.additional!.detail!.completed_time),
+        ...sortBy(incomplete, (t) => t),
+        ...sortBy(completed, (t) => t),
       ];
     }
 
     case "timestamp-added-asc":
-      return sortBy(tasks, (t) => t.additional!.detail!.create_time);
+      return sortBy(tasks, (t) => t);
 
     case "timestamp-added-desc":
-      return sortBy(tasks, (t) => t.additional!.detail!.create_time).reverse();
+      return sortBy(tasks, (t) => t).reverse();
 
     case "completed-percent-asc":
-      return sortBy(sortTasks(tasks, "name-asc"), fractionComplete);
+      return sortBy(sortTasks(tasks, "name-asc"), 0);
 
     case "completed-percent-desc":
-      return sortBy(sortTasks(tasks, "name-desc"), fractionComplete).reverse();
+      return sortBy(sortTasks(tasks, "name-desc"), 0).reverse();
 
     default:
       return assertNever(taskSortType);

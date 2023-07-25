@@ -3,7 +3,6 @@ import * as React from "react";
 import classNames from "classnames";
 import { moment } from "../common/moment";
 import type { CachedTasks } from "../common/state";
-import { formatMetric1024 } from "../common/format";
 
 export interface Props extends CachedTasks {}
 
@@ -15,14 +14,14 @@ export function Footer(props: Props) {
     return null;
   }
 
-  const totalDownloadSpeed = props.tasks.reduce(
-    (acc, t) => acc + t.additional!.transfer!.speed_download,
-    0,
-  );
-  const totalUploadSpeed = props.tasks.reduce(
-    (acc, t) => acc + t.additional!.transfer!.speed_upload,
-    0,
-  );
+  // const totalDownloadSpeed = props.tasks.reduce(
+  //   (acc, t) => acc + t.additional!.transfer!.speed_download,
+  //   0,
+  // );
+  // const totalUploadSpeed = props.tasks.reduce(
+  //   (acc, t) => acc + t.additional!.transfer!.speed_upload,
+  //   0,
+  // );
 
   let tooltip: string;
   let text: string | undefined = undefined;
@@ -55,9 +54,9 @@ export function Footer(props: Props) {
 
   return (
     <footer>
-      <span className="fa fa-arrow-down" /> {formatMetric1024(totalDownloadSpeed)}B/s
-      <span className="spacer" />
-      <span className="fa fa-arrow-up" /> {formatMetric1024(totalUploadSpeed)}B/s
+      {/*<span className="fa fa-arrow-down" /> {formatMetric1024(totalDownloadSpeed)}B/s*/}
+      {/*<span className="spacer" />*/}
+      {/*<span className="fa fa-arrow-up" /> {formatMetric1024(totalUploadSpeed)}B/s*/}
       <span className={classNames("status", intent)} title={tooltip}>
         <span className={classNames("fa", icon)} />
         {text}
