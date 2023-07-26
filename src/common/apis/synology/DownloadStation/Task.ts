@@ -1,4 +1,4 @@
-import { ApiBuilder, BaseRequest, FormFile, RestApiResponse, get, post } from "../shared";
+import { ApiBuilder, BaseRequest, RestApiResponse, post } from "../shared";
 
 export type DownloadStationTaskAdditionalType = "detail" | "transfer" | "file" | "tracker" | "peer";
 
@@ -8,10 +8,13 @@ export interface DownloadStationTaskListRequest extends BaseRequest {
   additional?: DownloadStationTaskAdditionalType[];
 }
 
-export interface DownloadStationTaskListResponse {
-  // total is the number of results that came back, NOT the total number that exist on the remote.
+export interface DownloadStationDataListResponse {
   total: number;
-  offset: number;
+  data: DownloadStationTask[];
+}
+
+export interface DownloadStationTaskListResponse {
+  total: number;
   tasks: DownloadStationTask[];
 }
 
@@ -120,12 +123,12 @@ export interface DownloadStationTask {
   uuid: string;
   filename: string;
   url: string;
-  dltype: 'aria2'|'curl'|'youtube-dl';
+  dltype: "aria2" | "curl" | "youtube-dl";
   downloading: boolean;
   filesize: number;
   parts: number;
-  format: string; // ???
-  keepvideo: string; // ???
+  format: string;
+  keepvideo: string;
   subtitles: boolean;
   sharedfoldername: string;
   sharedfolderref: string;
@@ -142,17 +145,23 @@ export interface DownloadStationTaskGetInfoResponse {
 }
 
 export interface DownloadStationTaskCreateRequest extends BaseRequest {
-  uri?: string[];
-  file?: FormFile;
-  username?: string;
-  password?: string;
-  unzip_password?: string;
-  destination?: string;
+  params: DownloadStationTaskCreateRequestParams;
+}
+
+export interface DownloadStationTaskCreateRequestParams extends Record<string, unknown> {
+  uuid: DownloadStationTask["uuid"];
+  filename: DownloadStationTask["filename"];
+  url: DownloadStationTask["url"][];
+  dltype: DownloadStationTask["dltype"];
+  parts: DownloadStationTask["parts"];
+  format: DownloadStationTask["format"];
+  sharedfolderref: DownloadStationTask["sharedfolderref"];
+  subtitles: DownloadStationTask["subtitles"];
+  delete: DownloadStationTask["delete"];
 }
 
 export interface DownloadStationTaskDeleteRequest extends BaseRequest {
-  id: string[];
-  force_complete: boolean;
+  uuid: DownloadStationTask["uuid"];
 }
 
 export type DownloadStationTaskActionResponse = {
@@ -179,99 +188,27 @@ const taskBuilder = new ApiBuilder(CGI_NAME, API_NAME, {
 
 function Task_Create(
   baseUrl: string,
-  sid: string,
   options: DownloadStationTaskCreateRequest,
 ): Promise<RestApiResponse<{}>> {
-  if (options.file && options.uri) {
-    throw new Error("cannot specify both a file and a uri argument to Create");
-  }
   const commonOptions = {
     ...options,
-    api: API_NAME,
+    service: API_NAME,
     version: 1,
-    method: "create",
-    sid,
+    method: "setDownload",
     meta: {
       apiGroup: "DownloadStation",
       apiSubgroup: "DownloadStation.Task",
     },
-    file: undefined,
-    uri: undefined,
   };
 
-  if (options.file) {
-    return post(baseUrl, CGI_NAME, {
-      ...commonOptions,
-      file: options.file,
-    });
-  } else {
-    return get(baseUrl, CGI_NAME, {
-      ...commonOptions,
-      uri: options.uri?.length ? options.uri.join(",") : undefined,
-    });
-  }
-}
-
-function fixTaskNumericTypes(task: DownloadStationTask): DownloadStationTask {
-  function sideEffectCastNumbers<T extends object, K extends keyof T>(
-    obj: T | null | undefined,
-    keys: Extract<keyof T, T[K] extends number ? K : never>[],
-  ): void {
-    if (obj != null) {
-      keys.forEach((k) => {
-        if (obj[k] != null) {
-          // We don't expect any of these values to be greater than Number.MAX_SAFE_INTEGER, so this is safe.
-          // If they are, so be it: you have a 9 quadrillion byte download, so you probably have other problems.
-          obj[k] = +obj[k] as any;
-        }
-      });
-    }
-  }
-
-  const output = { ...task };
-  sideEffectCastNumbers(output, ["size"]);
-  if (output.additional) {
-    sideEffectCastNumbers(output.additional.detail, [
-      "completed_time",
-      "connected_leechers",
-      "connected_peers",
-      "connected_seeders",
-      "create_time",
-      "seedelapsed",
-      "started_time",
-      "total_peers",
-      "total_pieces",
-      "waiting_seconds",
-    ]);
-    if (output.additional.file) {
-      output.additional.file.forEach((f) => {
-        sideEffectCastNumbers(f, ["index", "size", "size_downloaded"]);
-      });
-    }
-    if (output.additional.peer) {
-      output.additional.peer.forEach((p) => {
-        sideEffectCastNumbers(p, ["progress", "speed_download", "speed_upload"]);
-      });
-    }
-    if (output.additional.tracker) {
-      output.additional.tracker.forEach((t) => {
-        sideEffectCastNumbers(t, ["peers", "seeds", "update_timer"]);
-      });
-    }
-    sideEffectCastNumbers(output.additional.transfer, [
-      "downloaded_pieces",
-      "size_downloaded",
-      "size_uploaded",
-      "speed_download",
-      "speed_upload",
-    ]);
-  }
-  return output;
+  return post(baseUrl, CGI_NAME, {
+    ...commonOptions,
+  });
 }
 
 export const Task = {
   API_NAME,
-  List: taskBuilder.makePost<DownloadStationTaskListRequest, DownloadStationTaskListResponse>(
+  List: taskBuilder.makePost<DownloadStationTaskListRequest, DownloadStationDataListResponse>(
     "getDownloadList",
     { limit: -1, start: 0 },
     (o) => ({
@@ -281,29 +218,30 @@ export const Task = {
     (r) => ({ ...r, tasks: r.data }),
     true,
   ),
-  GetInfo: taskBuilder.makeGet<
-    DownloadStationTaskGetInfoRequest,
-    DownloadStationTaskGetInfoResponse
-  >("getinfo", (o) => ({
-    ...o,
-    id: o.id.join(","),
-    additional: o?.additional?.length ? o.additional.join(",") : undefined,
-  })),
+  // GetInfo: taskBuilder.makeGet<
+  //   DownloadStationTaskGetInfoRequest,
+  //   DownloadStationTaskGetInfoResponse
+  // >("getinfo", (o) => ({
+  //   ...o,
+  //   id: o.id.join(","),
+  //   additional: o?.additional?.length ? o.additional.join(",") : undefined,
+  // })),
   Create: Task_Create,
-  Delete: taskBuilder.makeGet<DownloadStationTaskDeleteRequest, DownloadStationTaskActionResponse>(
-    "delete",
-    (o) => ({ ...o, id: o.id.join(",") }),
+  Delete: taskBuilder.makePost<DownloadStationTaskDeleteRequest, DownloadStationTaskActionResponse>(
+    "deleteDownload",
+    {},
+    (o) => ({ ...o, params: { uuid: o.uuid } }),
   ),
-  Pause: taskBuilder.makeGet<
-    DownloadStationTaskPauseResumeRequest,
-    DownloadStationTaskActionResponse
-  >("pause", (o) => ({ ...o, id: o.id.join(",") })),
-  Resume: taskBuilder.makeGet<
-    DownloadStationTaskPauseResumeRequest,
-    DownloadStationTaskActionResponse
-  >("resume", (o) => ({ ...o, id: o.id.join(",") })),
-  Edit: taskBuilder.makeGet<DownloadStationTaskEditRequest, DownloadStationTaskActionResponse>(
-    "edit",
-    (o) => ({ ...o, id: o.id.join(",") }),
-  ),
+  // Pause: taskBuilder.makeGet<
+  //   DownloadStationTaskPauseResumeRequest,
+  //   DownloadStationTaskActionResponse
+  // >("pause", (o) => ({ ...o, id: o.id.join(",") })),
+  // Resume: taskBuilder.makeGet<
+  //   DownloadStationTaskPauseResumeRequest,
+  //   DownloadStationTaskActionResponse
+  // >("resume", (o) => ({ ...o, id: o.id.join(",") })),
+  // Edit: taskBuilder.makeGet<DownloadStationTaskEditRequest, DownloadStationTaskActionResponse>(
+  //   "edit",
+  //   (o) => ({ ...o, id: o.id.join(",") }),
+  // ),
 };

@@ -60,12 +60,12 @@ export interface GetConfig {
 
 export interface ListDirectories {
   type: "list-directories";
-  path?: string;
 }
 
 export interface Directory {
   name: string;
-  path: string;
+  description: string;
+  uuid: string;
 }
 
 export interface SetLoginPassword {
@@ -154,9 +154,7 @@ export const DeleteTasks = makeMessageOperations("delete-tasks", (taskIds: strin
 
 export const GetConfig = makeMessageOperations("get-config", () => ({}));
 
-export const ListDirectories = makeMessageOperations("list-directories", (path?: string) => ({
-  path,
-}));
+export const ListDirectories = makeMessageOperations("list-directories", () => ({}));
 
 export const SetLoginPassword = makeMessageOperations("set-login-password", (password: string) => ({
   password,

@@ -74,9 +74,9 @@ const MESSAGE_HANDLERS: MessageHandlers = {
     return response;
   },
   "delete-tasks": async (m, state) => {
-    const response = toMessageResponse(
-      await state.api.DownloadStation.Task.Delete({ id: m.taskIds, force_complete: false }),
-    );
+    const ids = m.taskIds.map((uuid) => state.api.DownloadStation.Task.Delete({ uuid }));
+    const response = toMessageResponse(await Promise.all(ids).then((r) => r[0]));
+
     if (response.success) {
       await pollTasks(state.api, state.pollRequestManager);
     }
@@ -85,23 +85,8 @@ const MESSAGE_HANDLERS: MessageHandlers = {
   "get-config": async (_m, state) => {
     return toMessageResponse(await state.api.DownloadStation.Info.GetConfig(), (data) => data);
   },
-  "list-directories": async (m, state) => {
-    const { path } = m;
-    if (path) {
-      return toMessageResponse(
-        await state.api.FileStation.List.list({
-          folder_path: path,
-          sort_by: "name",
-          filetype: "dir",
-        }),
-        (data) => data.files,
-      );
-    } else {
-      return toMessageResponse(
-        await state.api.FileStation.List.list_share({ sort_by: "name" }),
-        (data) => data.shares,
-      );
-    }
+  "list-directories": async (_m, state) => {
+    return toMessageResponse(await state.api.FileStation.List.list({}), (data) => data);
   },
   "set-login-password": async (m, state) => {
     if (state.api.partiallyUpdateSettings({ passwd: m.password })) {

@@ -99,7 +99,7 @@ async function fetchWithErrorHandling(
       console.log(JSON.parse(init.body), rrr);
       return {
         success: true,
-        data: {...(rrr).response},
+        data: rrr.response,
         meta,
       };
     }
@@ -140,10 +140,10 @@ export async function post<O extends object>(
   request: ApiRequest,
 ): Promise<RestApiResponse<O>> {
   const url = `${baseUrl}/rpc.php`;
-  const headers = new Headers({ 'Content-Type': 'application/json' });
-  const bodyEntries = Object.entries(request).filter(([k, v]) => (
-      k !== "timeout" && k !== "meta" && v !== undefined && !isFormFile(v)
-  ));
+  const headers = new Headers({ "Content-Type": "application/json" });
+  const bodyEntries = Object.entries(request).filter(
+    ([k, v]) => k !== "timeout" && k !== "meta" && v !== undefined && !isFormFile(v),
+  );
   const body = JSON.stringify(Object.fromEntries(bodyEntries));
 
   return fetchWithErrorHandling(url, { method: "POST", headers, body }, request.timeout, {
@@ -173,18 +173,18 @@ export class ApiBuilder {
     postprocess?: (response: object) => object,
     _optional?: true,
   ) {
-    return this.makeApiRequest(get, methodName, preprocess, postprocess);
+    return this.makeApiRequest(get, methodName, null, preprocess, postprocess);
   }
 
   makePost<I extends BaseRequest, O>(
     methodName: string,
-    params: Params,
+    params: Params | null,
     preprocess?: (options: I) => object,
     postprocess?: (response: O) => O,
   ): (baseUrl: string, sid: string, options: I) => Promise<RestApiResponse<O>>;
   makePost<I extends BaseRequest, O>(
     methodName: string,
-    params: Params,
+    params: Params | null,
     preprocess: ((options?: I) => object) | undefined,
     postprocess: ((response: O) => O) | undefined,
     optional: true,
@@ -192,7 +192,7 @@ export class ApiBuilder {
 
   makePost(
     methodName: string,
-    params: Params,
+    params: Params | null,
     preprocess?: (options: object) => object,
     postprocess?: (response: object) => object,
     _optional?: true,
@@ -203,7 +203,7 @@ export class ApiBuilder {
   private makeApiRequest(
     method: typeof get | typeof post,
     methodName: string,
-    params: Params,
+    params: Params | null,
     preprocess?: (options: object) => object,
     postprocess?: (response: object) => object,
   ) {

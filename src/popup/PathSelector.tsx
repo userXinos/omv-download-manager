@@ -7,7 +7,6 @@ import {
   isUnloadedChild,
   isLoadedChild,
   isErrorChild,
-  recursivelyUpdateDirectoryTree,
 } from "./DirectoryTree";
 import type { PopupClient } from "./popupClient";
 
@@ -27,7 +26,8 @@ export class PathSelector extends React.PureComponent<Props, State> {
   state: State = {
     directoryTree: {
       name: "/",
-      path: ROOT_PATH,
+      uuid: ROOT_PATH,
+      description: ROOT_PATH,
       children: "unloaded",
     },
   };
@@ -55,7 +55,7 @@ export class PathSelector extends React.PureComponent<Props, State> {
         <div>
           {this.state.directoryTree.children.map((directory) => (
             <DirectoryTree
-              key={directory.path}
+              key={directory.uuid}
               file={directory}
               requestLoad={this.loadNestedDirectory}
               selectedPath={this.props.selectedPath}
@@ -90,43 +90,37 @@ export class PathSelector extends React.PureComponent<Props, State> {
       const response = await this.props.client.listDirectories(path);
 
       if (stashedRequestVersion === this.requestVersionByPath[path]) {
-        this.updateTreeWithResponse(path, response);
+        this.updateTreeWithResponse(response);
       }
     }
   };
 
   private loadTopLevelDirectories = async () => {
-    this.setState({
-      directoryTree: recursivelyUpdateDirectoryTree(
-        this.state.directoryTree,
-        ROOT_PATH,
-        "unloaded",
-      ),
-    });
     const stashedRequestVersion = (this.requestVersionByPath[ROOT_PATH] =
       (this.requestVersionByPath[ROOT_PATH] || 0) + 1);
     const response = await this.props.client.listDirectories();
 
     if (stashedRequestVersion === this.requestVersionByPath[ROOT_PATH]) {
-      this.updateTreeWithResponse(ROOT_PATH, response);
+      this.updateTreeWithResponse(response);
     }
   };
 
-  private updateTreeWithResponse(path: string, response: MessageResponse<Directory[]>) {
+  private updateTreeWithResponse(response: MessageResponse<Directory[]>) {
     if (response.success) {
-      this.setState({
-        directoryTree: recursivelyUpdateDirectoryTree(
-          this.state.directoryTree,
-          path,
-          response.result.map((c) => ({ ...c, children: "unloaded" })),
-        ),
-      });
+      debugger;
+      this.setState((prev) => ({
+        directoryTree: {
+          ...prev.directoryTree,
+          children: response.result.map((c) => ({ ...c, children: [] })),
+        },
+      }));
     } else {
-      this.setState({
-        directoryTree: recursivelyUpdateDirectoryTree(this.state.directoryTree, path, {
-          failureMessage: response.reason,
-        }),
-      });
+      this.setState((prev) => ({
+        directoryTree: {
+          ...prev.directoryTree,
+          children: { failureMessage: response.reason },
+        },
+      }));
     }
   }
 }

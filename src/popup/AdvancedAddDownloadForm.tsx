@@ -77,41 +77,41 @@ export class AdvancedAddDownloadForm extends React.PureComponent<Props, State> {
           }}
           placeholder={browser.i18n.getMessage("URLs_to_download_one_per_line")}
         />
-        <div className="sibling-inputs">
-          <input
-            type="text"
-            className="input-field"
-            value={this.state.ftpUsername}
-            onChange={(e) => {
-              this.setState({ ftpUsername: e.currentTarget.value });
-            }}
-            placeholder={browser.i18n.getMessage("FTP_username")}
-          />
-          <input
-            type="password"
-            className="input-field"
-            value={this.state.ftpPassword}
-            onChange={(e) => {
-              this.setState({ ftpPassword: e.currentTarget.value });
-            }}
-            placeholder={browser.i18n.getMessage("FTP_password")}
-          />
-        </div>
-        <input
-          type="password"
-          className="input-field"
-          value={this.state.unzipPassword}
-          onChange={(e) => {
-            this.setState({ unzipPassword: e.currentTarget.value });
-          }}
-          disabled={!this.state.unzipEnabled}
-          title={
-            this.state.unzipEnabled
-              ? undefined
-              : browser.i18n.getMessage("Auto_Extract_service_is_disabled_in_Download_Station")
-          }
-          placeholder={browser.i18n.getMessage("Unzip_password")}
-        />
+        {/*<div className="sibling-inputs">*/}
+        {/*  <input*/}
+        {/*    type="text"*/}
+        {/*    className="input-field"*/}
+        {/*    value={this.state.ftpUsername}*/}
+        {/*    onChange={(e) => {*/}
+        {/*      this.setState({ ftpUsername: e.currentTarget.value });*/}
+        {/*    }}*/}
+        {/*    placeholder={browser.i18n.getMessage("FTP_username")}*/}
+        {/*  />*/}
+        {/*  <input*/}
+        {/*    type="password"*/}
+        {/*    className="input-field"*/}
+        {/*    value={this.state.ftpPassword}*/}
+        {/*    onChange={(e) => {*/}
+        {/*      this.setState({ ftpPassword: e.currentTarget.value });*/}
+        {/*    }}*/}
+        {/*    placeholder={browser.i18n.getMessage("FTP_password")}*/}
+        {/*  />*/}
+        {/*</div>*/}
+        {/*<input*/}
+        {/*  type="password"*/}
+        {/*  className="input-field"*/}
+        {/*  value={this.state.unzipPassword}*/}
+        {/*  onChange={(e) => {*/}
+        {/*    this.setState({ unzipPassword: e.currentTarget.value });*/}
+        {/*  }}*/}
+        {/*  disabled={!this.state.unzipEnabled}*/}
+        {/*  title={*/}
+        {/*    this.state.unzipEnabled*/}
+        {/*      ? undefined*/}
+        {/*      : browser.i18n.getMessage("Auto_Extract_service_is_disabled_in_Download_Station")*/}
+        {/*  }*/}
+        {/*  placeholder={browser.i18n.getMessage("Unzip_password")}*/}
+        {/*/>*/}
         <div className="download-path card">
           <div className="path-display" title={this.state.selectedPath}>
             {browser.i18n.getMessage("Download_to")}

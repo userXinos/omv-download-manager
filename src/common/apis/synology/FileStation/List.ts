@@ -85,17 +85,7 @@ export type FileStationFileAdditionalType =
   | "mount_point_type"
   | "type";
 
-export interface FileStationListListRequest extends BaseRequest {
-  folder_path: string;
-  offset?: number;
-  limit?: number;
-  sort_by?: "name" | "user" | "group" | "mtime" | "atime" | "ctime" | "crtime" | "posix" | "type";
-  sort_direction?: "asc" | "desc";
-  pattern?: string;
-  filetype?: "file" | "dir" | "all";
-  goto_path?: string;
-  additional?: FileStationFileAdditionalType[];
-}
+export interface FileStationListListRequest extends BaseRequest {}
 
 export interface FileStationFile {
   path: string;
@@ -113,11 +103,11 @@ export interface FileStationFile {
 }
 
 export interface FileStationFileList {
-  total: number;
-  offset: number;
-  files: (FileStationFile & {
-    children?: FileStationFileList;
-  })[];
+  uuid: string;
+  mntentref: string;
+  name: string;
+  description: string;
+  reldirpath: string;
 }
 
 export interface FileStationListGetInfoRequest extends BaseRequest {
@@ -129,7 +119,7 @@ export interface FileStationListGetInfoResponse {
   files: FileStationFile[];
 }
 
-const API_NAME = "SYNO.FileStation.List";
+const API_NAME = "ShareMgmt";
 const listBuilder = new ApiBuilder("entry", API_NAME, {
   apiGroup: "FileStation",
   apiSubgroup: "FileStation.List",
@@ -137,28 +127,28 @@ const listBuilder = new ApiBuilder("entry", API_NAME, {
 
 export const List = {
   API_NAME,
-  list_share: listBuilder.makeGet<
-    FileStationListListShareRequest,
-    FileStationListListShareResponse
-  >(
-    "list_share",
-    (o) => ({
-      ...o,
-      additional: o?.additional?.length ? o.additional.join(",") : undefined,
-    }),
-    undefined,
-    true,
+  // list_share: listBuilder.makeGet<
+  //   FileStationListListShareRequest,
+  //   FileStationListListShareResponse
+  // >(
+  //   "list_share",
+  //   (o) => ({
+  //     ...o,
+  //     additional: o?.additional?.length ? o.additional.join(",") : undefined,
+  //   }),
+  //   undefined,
+  //   true,
+  // ),
+  list: listBuilder.makePost<FileStationListListRequest, FileStationFileList[]>(
+    "enumerateSharedFolders",
+    null,
   ),
-  list: listBuilder.makeGet<FileStationListListRequest, FileStationFileList>("list", (o) => ({
-    ...o,
-    additional: o?.additional?.length ? o.additional.join(",") : undefined,
-  })),
-  getinfo: listBuilder.makeGet<FileStationListGetInfoRequest, FileStationListGetInfoResponse>(
-    "getinfo",
-    (o) => ({
-      ...o,
-      path: o.path.join(","),
-      additional: o?.additional?.length ? o.additional.join(",") : undefined,
-    }),
-  ),
+  // getinfo: listBuilder.makeGet<FileStationListGetInfoRequest, FileStationListGetInfoResponse>(
+  //   "getinfo",
+  //   (o) => ({
+  //     ...o,
+  //     path: o.path.join(","),
+  //     additional: o?.additional?.length ? o.additional.join(",") : undefined,
+  //   }),
+  // ),
 };

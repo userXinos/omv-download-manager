@@ -116,8 +116,7 @@ export class SynologyClient {
         ...request,
         ...restSettings,
         version: 2,
-      })
-        .catch((e) => ConnectionFailure.from(e));
+      }).catch((e) => ConnectionFailure.from(e));
     }
 
     return this.loginPromise;
@@ -163,7 +162,7 @@ export class SynologyClient {
   };
 
   private proxy<T, U>(
-    fn: (baseUrl: string, sid: string, options: T) => Promise<RestApiResponse<U>>,
+    fn: (baseUrl: string, options: T) => Promise<RestApiResponse<U>>,
   ): (options: T) => Promise<ClientRequestResult<U>> {
     const wrappedFunction = async (
       options: T,
@@ -199,7 +198,7 @@ export class SynologyClient {
         } else if (ClientRequestResult.isConnectionFailure(loginResult) || !loginResult.success) {
           return await maybeLogoutAndRetry(loginResult);
         } else {
-          const response = await fn(this.settings.baseUrl!, loginResult.data.sid, options);
+          const response = await fn(this.settings.baseUrl!, options);
 
           if (this.settingsVersion !== versionAtInit) {
             return await wrappedFunction(options);
@@ -218,7 +217,7 @@ export class SynologyClient {
   }
 
   private proxyOptionalArgs<T, U>(
-    fn: (baseUrl: string, sid: string, options?: T) => Promise<RestApiResponse<U>>,
+    fn: (baseUrl: string, options?: T) => Promise<RestApiResponse<U>>,
   ): (options?: T) => Promise<ClientRequestResult<U>> {
     return this.proxy(fn);
   }
