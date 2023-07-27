@@ -1,5 +1,8 @@
 import { ApiBuilder, BaseRequest, RestApiResponse, post } from "../shared";
 
+// https://github.com/openmediavault/openmediavault/blob/master/deb/openmediavault/debian/openmediavault.openmediavault.default#L36
+const UUID_TOKEN = "fa4b1c66-ef79-11e5-87a0-0002b3a176b4";
+
 export type DownloadStationTaskAdditionalType = "detail" | "transfer" | "file" | "tracker" | "peer";
 
 export interface DownloadStationTaskListRequest extends BaseRequest {
@@ -119,11 +122,17 @@ export const ALL_TASK_ERROR_STATUSES = Object.keys(
   __taskErrorStatuses,
 ) as DownloadStationTaskErrorStatus[];
 
+export enum DownloadStationTaskDLTYPE {
+  ARIA2 = "aria2",
+  CURL = "curl",
+  YTDL = "youtube-dl",
+}
+
 export interface DownloadStationTask {
   uuid: string;
   filename: string;
   url: string;
-  dltype: "aria2" | "curl" | "youtube-dl";
+  dltype: DownloadStationTaskDLTYPE;
   downloading: boolean;
   filesize: number;
   parts: number;
@@ -149,12 +158,11 @@ export interface DownloadStationTaskCreateRequest extends BaseRequest {
 }
 
 export interface DownloadStationTaskCreateRequestParams extends Record<string, unknown> {
-  uuid: DownloadStationTask["uuid"];
   filename: DownloadStationTask["filename"];
-  url: DownloadStationTask["url"][];
+  url: DownloadStationTask["url"];
   dltype: DownloadStationTask["dltype"];
-  parts: DownloadStationTask["parts"];
-  format: DownloadStationTask["format"];
+  parts?: DownloadStationTask["parts"];
+  format?: DownloadStationTask["format"];
   sharedfolderref: DownloadStationTask["sharedfolderref"];
   subtitles: DownloadStationTask["subtitles"];
   delete: DownloadStationTask["delete"];
@@ -200,6 +208,7 @@ function Task_Create(
       apiSubgroup: "DownloadStation.Task",
     },
   };
+  commonOptions.params.uuid = UUID_TOKEN;
 
   return post(baseUrl, CGI_NAME, {
     ...commonOptions,

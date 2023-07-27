@@ -1,9 +1,4 @@
-import {
-  SynologyClient,
-  ClientRequestResult,
-  DownloadStation2,
-  FormFile,
-} from "../../common/apis/synology";
+import { SynologyClient, ClientRequestResult } from "../../common/apis/synology";
 import { getErrorForFailedResponse } from "../../common/apis/errors";
 import { saveLastSevereError } from "../../common/errorHandlers";
 import { assertNever } from "../../common/lang";
@@ -18,6 +13,7 @@ import { pollTasks } from "./pollTasks";
 import type { UnionByDiscriminant } from "../../common/types";
 import type { AddTaskOptions } from "../../common/apis/messages";
 import type { RequestManager } from "../requestManager";
+import { DownloadStationTaskDLTYPE } from "../../common/apis/synology/DownloadStation/Task";
 
 type ArrayifyValues<T extends Record<string, any>> = {
   [K in keyof T]: T[K][];
@@ -54,12 +50,16 @@ function reportUnexpectedError(
   );
 }
 
+function getFileNameFromUrl(url: string): string {
+  return url.split("/").pop()?.split("?")[0].split("#")[0] || "";
+}
+
 async function addOneTask(
   api: SynologyClient,
   pollRequestManager: RequestManager,
   showNonErrorNotifications: boolean,
   url: string,
-  { path, ftpUsername, ftpPassword, unzipPassword }: AddTaskOptions,
+  { path }: AddTaskOptions,
 ) {
   async function reportTaskAddResult(
     result: ClientRequestResult<unknown>,
@@ -114,24 +114,26 @@ async function addOneTask(
     ? notify(browser.i18n.getMessage("Adding_download"), guessFileNameFromUrl(url) ?? url)
     : undefined;
 
-  const resolvedUrl = await resolveUrl(url, ftpUsername, ftpPassword);
+  const resolvedUrl = await resolveUrl(url, undefined, undefined);
 
   const commonCreateOptionsV1 = {
-    destination: path,
-    username: ftpUsername,
-    password: ftpPassword,
-    unzip_password: unzipPassword,
-  };
-  const commonCreateOptionsV2 = {
-    destination: path,
-    extract_password: unzipPassword,
+    sharedfolderref: path,
+    dltype: DownloadStationTaskDLTYPE.ARIA2,
+    format: "",
+    parts: 20,
+    subtitles: false,
+    delete: false,
   };
 
   if (resolvedUrl.type === "direct-download") {
     try {
+      const fUrl = resolvedUrl.url.toString();
       const result = await api.DownloadStation.Task.Create({
-        uri: [sanitizeUrlForSynology(resolvedUrl.url).toString()],
-        ...commonCreateOptionsV1,
+        params: {
+          url: fUrl,
+          filename: getFileNameFromUrl(fUrl),
+          ...commonCreateOptionsV1,
+        },
       });
       await reportTaskAddResult(result, guessFileNameFromUrl(url));
       await pollTasks(api, pollRequestManager);
@@ -140,35 +142,7 @@ async function addOneTask(
     }
   } else if (resolvedUrl.type === "metadata-file") {
     try {
-      const supportsNewApiQueryResult = await api.Info.Query({
-        query: [DownloadStation2.Task.API_NAME],
-      });
-      if (ClientRequestResult.isConnectionFailure(supportsNewApiQueryResult)) {
-        await reportTaskAddResult(supportsNewApiQueryResult, resolvedUrl.filename);
-      } else {
-        const file: FormFile = { content: resolvedUrl.content, filename: resolvedUrl.filename };
-        let result;
-        if (
-          supportsNewApiQueryResult.success &&
-          // Synology seems to have some bizarre malformed implementation of this that has a
-          // maxVersion of 1. Note that the implementation of Create is haredcoded to version 2,
-          // probably for this reason.
-          (supportsNewApiQueryResult.data[DownloadStation2.Task.API_NAME]?.maxVersion ?? 0) >= 2
-        ) {
-          result = await api.DownloadStation2.Task.Create({
-            type: "file",
-            file,
-            ...commonCreateOptionsV2,
-          });
-        } else {
-          result = await api.DownloadStation.Task.Create({
-            file,
-            ...commonCreateOptionsV1,
-          });
-        }
-        await reportTaskAddResult(result, resolvedUrl.filename);
-        await pollTasks(api, pollRequestManager);
-      }
+      console.log("metadata-file moment");
     } catch (e) {
       reportUnexpectedError(notificationId, e, "error while adding metadata-file task");
     }
@@ -191,7 +165,7 @@ async function addMultipleTasks(
   pollRequestManager: RequestManager,
   showNonErrorNotifications: boolean,
   urls: string[],
-  { path, ftpUsername, ftpPassword, unzipPassword }: AddTaskOptions,
+  { path }: AddTaskOptions,
 ) {
   const notificationId = showNonErrorNotifications
     ? notify(
@@ -200,9 +174,7 @@ async function addMultipleTasks(
       )
     : undefined;
 
-  const resolvedUrls = await Promise.all(
-    urls.map((url) => resolveUrl(url, ftpUsername, ftpPassword)),
-  );
+  const resolvedUrls = await Promise.all(urls.map((url) => resolveUrl(url, undefined, undefined)));
 
   const groupedUrls: ResolvedUrlByType = {
     "direct-download": [],
@@ -237,66 +209,39 @@ async function addMultipleTasks(
   failures += groupedUrls["missing-or-illegal"].length;
 
   const commonCreateOptionsV1 = {
-    destination: path,
-    username: ftpUsername,
-    password: ftpPassword,
-    unzip_password: unzipPassword,
-  };
-
-  const commonCreateOptionsV2 = {
-    destination: path,
-    extract_password: unzipPassword,
+    sharedfolderref: path,
+    dltype: DownloadStationTaskDLTYPE.ARIA2,
+    //format: string,
+    subtitles: false,
+    delete: false,
   };
 
   if (groupedUrls["direct-download"].length > 0) {
     const urls = groupedUrls["direct-download"].map(({ url }) => sanitizeUrlForSynology(url));
-    try {
-      const result = await api.DownloadStation.Task.Create({
-        uri: urls.map((url) => url.toString()),
-        ...commonCreateOptionsV1,
-      });
-      countResults(result, urls.length);
-    } catch (e) {
-      failures += urls.length;
-      saveLastSevereError(e, "error while adding multiple direct-download URLs");
-    }
-  }
-
-  if (groupedUrls["metadata-file"].length > 0) {
-    const supportsNewApiQueryResult = await api.Info.Query({
-      query: [DownloadStation2.Task.API_NAME],
-    });
-
-    const results = groupedUrls["metadata-file"].map((file) => {
-      if (ClientRequestResult.isConnectionFailure(supportsNewApiQueryResult)) {
-        return Promise.resolve(supportsNewApiQueryResult);
-      } else if (
-        supportsNewApiQueryResult.success &&
-        supportsNewApiQueryResult.data[DownloadStation2.Task.API_NAME] != null
-      ) {
-        return api.DownloadStation2.Task.Create({
-          type: "file",
-          file,
-          ...commonCreateOptionsV2,
-        });
-      } else {
-        return api.DownloadStation.Task.Create({
-          file,
+    const results = urls.map((u) => {
+      const fUrl = u.toString();
+      return api.DownloadStation.Task.Create({
+        params: {
+          url: fUrl,
+          filename: getFileNameFromUrl(fUrl),
           ...commonCreateOptionsV1,
-        });
-      }
+        },
+      });
     });
-
     await Promise.all(
       results.map(async (r) => {
         try {
           countResults(await r, 1);
         } catch (e) {
           failures += 1;
-          saveLastSevereError(e, "error while a adding a metadata-file URL");
+          saveLastSevereError(e, "error while a adding a direct-download URL");
         }
       }),
     );
+  }
+
+  if (groupedUrls["metadata-file"].length > 0) {
+    console.log("metadata-file moment");
   }
 
   if (successes > 0 && failures === 0) {
@@ -333,36 +278,23 @@ export async function addDownloadTasksAndPoll(
   api: SynologyClient,
   pollRequestManager: RequestManager,
   showNonErrorNotifications: boolean,
-  urls: string[],
-  options?: AddTaskOptions,
+  options: AddTaskOptions,
 ): Promise<void> {
-  const normalizedOptions = {
-    ...options,
-    // TODO: This seems wrong. Shouldn't this be ... ? path.slice(1) : path?
-    path: options?.path?.startsWith("/") ? options?.path.slice(1) : undefined,
-  };
-
-  if (urls.length === 0) {
+  if (options.urls.length === 0) {
     notify(
       browser.i18n.getMessage("Failed_to_add_download"),
       browser.i18n.getMessage("No_downloadable_URLs_provided"),
       "failure",
     );
-  } else if (urls.length === 1) {
-    await addOneTask(
-      api,
-      pollRequestManager,
-      showNonErrorNotifications,
-      urls[0],
-      normalizedOptions,
-    );
+  } else if (options.urls.length === 1) {
+    await addOneTask(api, pollRequestManager, showNonErrorNotifications, options.urls[0], options);
   } else {
     await addMultipleTasks(
       api,
       pollRequestManager,
       showNonErrorNotifications,
-      urls,
-      normalizedOptions,
+      options.urls,
+      options,
     );
   }
 }

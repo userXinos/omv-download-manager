@@ -34,7 +34,7 @@ export interface Props {
   file: DirectoryTreeFile;
   selectedPath?: string;
   requestLoad: (path: string) => void;
-  onSelect: (path: string | undefined) => void;
+  onSelect: (path: string) => void;
 }
 
 export interface State {
@@ -110,7 +110,7 @@ export class DirectoryTree extends React.PureComponent<Props, State> {
       this.props.selectedPath &&
       this.props.selectedPath.startsWith(this.props.file.uuid)
     ) {
-      this.props.onSelect(undefined);
+      this.props.onSelect("");
     }
   };
 

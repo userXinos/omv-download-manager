@@ -48,7 +48,6 @@ const MESSAGE_HANDLERS: MessageHandlers = {
       state.api,
       state.pollRequestManager,
       state.showNonErrorNotifications,
-      m.urls,
       m.options,
     );
   },

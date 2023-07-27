@@ -19,7 +19,7 @@ import { testConnection } from "../common/apis/connection";
 
 export interface PopupClient {
   openDownloadStationUi: () => void;
-  createTasks: (urls: string[], options?: AddTaskOptions) => void;
+  createTasks: (options?: AddTaskOptions) => void;
   pauseTask: (taskId: string) => Promise<MessageResponse>;
   resumeTask: (taskId: string) => Promise<MessageResponse>;
   deleteTasks: (taskIds: string[]) => Promise<MessageResponse>;

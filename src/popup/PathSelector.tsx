@@ -14,7 +14,7 @@ const ROOT_PATH = "/";
 
 export interface Props {
   selectedPath: string | undefined;
-  onSelectPath: (path: string | undefined) => void;
+  onSelectPath: (path: string) => void;
   client: PopupClient;
 }
 
@@ -73,7 +73,7 @@ export class PathSelector extends React.PureComponent<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     if (this.props.client !== prevProps.client) {
-      this.props.onSelectPath(undefined);
+      this.props.onSelectPath("");
       this.loadTopLevelDirectories();
     }
   }
@@ -107,7 +107,6 @@ export class PathSelector extends React.PureComponent<Props, State> {
 
   private updateTreeWithResponse(response: MessageResponse<Directory[]>) {
     if (response.success) {
-      debugger;
       this.setState((prev) => ({
         directoryTree: {
           ...prev.directoryTree,

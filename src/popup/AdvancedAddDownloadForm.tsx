@@ -14,53 +14,23 @@ export interface Props {
 }
 
 export interface State {
-  selectedPath: string | undefined;
+  selectedPath: string;
   downloadUrl: string;
-  ftpUsername: string;
-  ftpPassword: string;
-  unzipPassword: string;
-  unzipEnabled: boolean;
+  // ftpUsername: string;
+  // ftpPassword: string;
+  // unzipPassword: string;
+  // unzipEnabled: boolean;
 }
 
 export class AdvancedAddDownloadForm extends React.PureComponent<Props, State> {
   state: State = {
-    selectedPath: undefined,
+    selectedPath: "",
     downloadUrl: "",
-    ftpUsername: "",
-    ftpPassword: "",
-    unzipPassword: "",
-    unzipEnabled: true,
+    // ftpUsername: "",
+    // ftpPassword: "",
+    // unzipPassword: "",
+    // unzipEnabled: true,
   };
-
-  private async updateIsUnzipEnabled() {
-    let unzipEnabled: boolean;
-
-    try {
-      const response = await this.props.client.getConfig();
-      if (!response.success) {
-        unzipEnabled = false;
-      } else {
-        unzipEnabled = response.result.unzip_service_enabled;
-      }
-    } catch (e) {
-      unzipEnabled = false;
-    }
-
-    this.setState({ unzipEnabled });
-    if (!unzipEnabled) {
-      this.setState({ unzipPassword: "" });
-    }
-  }
-
-  componentDidMount() {
-    this.updateIsUnzipEnabled();
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (this.props.client !== prevProps.client) {
-      this.updateIsUnzipEnabled();
-    }
-  }
 
   render() {
     const hasDownloadUrl = this.state.downloadUrl.length > 0;
@@ -153,16 +123,14 @@ export class AdvancedAddDownloadForm extends React.PureComponent<Props, State> {
       .map((url) => url.trim())
       // The cheapest of checks. Actual invalid URLs will be caught later.
       .filter((url) => startsWithAnyProtocol(url, ALL_DOWNLOADABLE_PROTOCOLS));
-    this.props.client.createTasks(urls, {
+    this.props.client.createTasks({
+      urls,
       path: this.state.selectedPath,
-      ftpPassword: this.state.ftpPassword.trim() || undefined,
-      ftpUsername: this.state.ftpUsername.trim() || undefined,
-      unzipPassword: this.state.unzipPassword.trim() || undefined,
     });
     this.props.onClose();
   };
 
-  private setSelectedPath = (selectedPath: string | undefined) => {
+  private setSelectedPath = (selectedPath: string) => {
     this.setState({ selectedPath });
   };
 }

@@ -24,15 +24,16 @@ export const MessageResponse = {
 
 export interface AddTasks {
   type: "add-tasks";
-  urls: string[];
   options: AddTaskOptions;
 }
 
 export interface AddTaskOptions {
-  path?: string;
-  ftpUsername?: string;
-  ftpPassword?: string;
-  unzipPassword?: string;
+  path: string;
+  urls: string[];
+  //dltype: string;
+  //format: string;
+  //subtitles: boolean;
+  //delete: boolean;
 }
 
 export interface PollTasks {
@@ -130,13 +131,9 @@ function makeMessageOperations<T extends Message["type"], U extends any[]>(
   };
 }
 
-export const AddTasks = makeMessageOperations(
-  "add-tasks",
-  (urls: string[], options: AddTaskOptions = {}) => ({
-    urls,
-    options,
-  }),
-);
+export const AddTasks = makeMessageOperations("add-tasks", (options: AddTaskOptions) => ({
+  options,
+}));
 
 export const PollTasks = makeMessageOperations("poll-tasks", () => ({}));
 
