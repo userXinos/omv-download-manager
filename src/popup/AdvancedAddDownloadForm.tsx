@@ -16,20 +16,12 @@ export interface Props {
 export interface State {
   selectedPath: string;
   downloadUrl: string;
-  // ftpUsername: string;
-  // ftpPassword: string;
-  // unzipPassword: string;
-  // unzipEnabled: boolean;
 }
 
 export class AdvancedAddDownloadForm extends React.PureComponent<Props, State> {
   state: State = {
     selectedPath: "",
     downloadUrl: "",
-    // ftpUsername: "",
-    // ftpPassword: "",
-    // unzipPassword: "",
-    // unzipEnabled: true,
   };
 
   render() {

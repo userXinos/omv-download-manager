@@ -1,6 +1,6 @@
-import { ClientRequestResult } from "../common/apis/synology";
-import { getErrorForFailedResponse, getErrorForConnectionFailure } from "../common/apis/errors";
-import { MessageResponse, Message, Result } from "../common/apis/messages";
+import { ClientRequestResult } from "../common/apis/OpenMediaVault";
+import { getErrorForConnectionFailure, getErrorForFailedResponse } from "../common/apis/errors";
+import { Message, MessageResponse, Result } from "../common/apis/messages";
 import { addDownloadTasksAndPoll, clearCachedTasks, pollTasks } from "./actions";
 import { BackgroundState, getMutableStateSingleton } from "./backgroundState";
 import type { DiscriminateUnion } from "../common/types";
@@ -36,6 +36,7 @@ function toMessageResponse<T, U>(
   } else {
     return {
       success: true,
+      // [Sean Kelley]:
       // Non-null assert: extract exists iff we are type-parameterized to something other than undefined.
       result: extract?.(response.data)!,
     };
@@ -54,26 +55,11 @@ const MESSAGE_HANDLERS: MessageHandlers = {
   "poll-tasks": (_m, state) => {
     return pollTasks(state.api, state.pollRequestManager);
   },
-  "pause-task": async (m, state) => {
-    const response = toMessageResponse(
-      await state.api.DownloadStation.Task.Pause({ id: [m.taskId] }),
-    );
-    if (response.success) {
-      await pollTasks(state.api, state.pollRequestManager);
-    }
-    return response;
-  },
-  "resume-task": async (m, state) => {
-    const response = toMessageResponse(
-      await state.api.DownloadStation.Task.Resume({ id: [m.taskId] }),
-    );
-    if (response.success) {
-      await pollTasks(state.api, state.pollRequestManager);
-    }
-    return response;
+  "start-task": async (m, state) => {
+    return toMessageResponse(await state.api.DownloaderPlugin.Task.Start({ uuid: m.taskId }));
   },
   "delete-tasks": async (m, state) => {
-    const ids = m.taskIds.map((uuid) => state.api.DownloadStation.Task.Delete({ uuid }));
+    const ids = m.taskIds.map((uuid) => state.api.DownloaderPlugin.Task.Delete({ uuid }));
     const response = toMessageResponse(await Promise.all(ids).then((r) => r[0]));
 
     if (response.success) {
@@ -81,14 +67,11 @@ const MESSAGE_HANDLERS: MessageHandlers = {
     }
     return response;
   },
-  "get-config": async (_m, state) => {
-    return toMessageResponse(await state.api.DownloadStation.Info.GetConfig(), (data) => data);
-  },
   "list-directories": async (_m, state) => {
-    return toMessageResponse(await state.api.FileStation.List.list({}), (data) => data);
+    return toMessageResponse(await state.api.ShareMgmt.Folders.list(), (r) => r);
   },
   "set-login-password": async (m, state) => {
-    if (state.api.partiallyUpdateSettings({ passwd: m.password })) {
+    if (state.api.partiallyUpdateSettings({ password: m.password })) {
       await clearCachedTasks();
     }
     // Always reset the session!

@@ -1,4 +1,4 @@
-import type { ConnectionFailure, RestApiFailureResponse } from "./synology";
+import type { ConnectionFailure, RpcFailureResponse } from "./OpenMediaVault";
 import { assertNever } from "../lang";
 
 const DOWNLOADSTATION_TASK_ERRORS: Record<string, string> = {
@@ -68,14 +68,13 @@ const ERROR_CODES: Record<string, Record<string, string>> = {
 };
 
 export function getErrorForFailedResponse(
-  response: RestApiFailureResponse,
+  response: RpcFailureResponse,
   defaultMessage: string = "Unknown error.",
 ): string {
+  console.log(response);
   return (
-    (response.meta.apiSubgroup
-      ? ERROR_CODES[response.meta.apiSubgroup]?.[response.error.code]
-      : null) ||
-    ERROR_CODES[response.meta.apiGroup]?.[response.error.code] ||
+    (response._meta.method ? ERROR_CODES[response._meta.method]?.[response.error.code] : null) ||
+    ERROR_CODES[response._meta.service]?.[response.error.code] ||
     ERROR_CODES.common[response.error.code] ||
     defaultMessage
   );

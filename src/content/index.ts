@@ -1,6 +1,6 @@
 import "../common/init/commonContext";
 import { AddTasks } from "../common/apis/messages";
-import { onStoredStateChange } from "../common/state/listen";
+import { onStoredStateChange } from "../common/state";
 import { DOWNLOAD_ONLY_PROTOCOLS, startsWithAnyProtocol } from "../common/apis/protocols";
 
 const LEFT_MOUSE_BUTTON = 0;
@@ -36,7 +36,8 @@ document.addEventListener("click", (e: MouseEvent) => {
       anchor.href &&
       startsWithAnyProtocol(anchor.href, DOWNLOAD_ONLY_PROTOCOLS)
     ) {
-      AddTasks.send([anchor.href]);
+      // TODO AddTasks
+      void AddTasks.send({ urls: [anchor.href], path: "" });
       e.preventDefault();
     }
   }

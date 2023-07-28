@@ -4,7 +4,7 @@ import * as React from "react";
 import { default as uniqueId } from "lodash/uniqueId";
 
 import type { ConnectionSettings as ConnectionSettingsObject } from "../common/state";
-import { ClientRequestResult } from "../common/apis/synology";
+import { ClientRequestResult } from "../common/apis/OpenMediaVault";
 import { SettingsList } from "../common/components/SettingsList";
 import { disabledPropAndClassName, kludgeRefSetClassname } from "../common/classnameUtil";
 import type { Overwrite } from "../common/types";
@@ -43,7 +43,9 @@ export class ConnectionSettings extends React.PureComponent<Props, State> {
         onSubmit={(e) => {
           e.preventDefault();
           assert(mergedSettings.password != null);
-          this.testConnectionAndSave(mergedSettings as ConnectionSettingsWithMandatoryPassword);
+          void this.testConnectionAndSave(
+            mergedSettings as ConnectionSettingsWithMandatoryPassword,
+          );
         }}
         className="connection-settings"
       >

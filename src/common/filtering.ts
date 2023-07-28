@@ -1,19 +1,19 @@
 import { default as sortBy } from "lodash/sortBy";
 import { default as partition } from "lodash/partition";
 import {
-  DownloadStationTask,
-  DownloadStationTaskNormalStatus,
-  DownloadStationTaskErrorStatus,
+  DownloaderPluginTask,
+  DownloaderPluginTaskNormalStatus,
+  DownloaderPluginTaskErrorStatus,
   ALL_TASK_ERROR_STATUSES,
   ALL_TASK_NORMAL_STATUSES,
-} from "../common/apis/synology/DownloadStation/Task";
+} from "./apis/OpenMediaVault/DownloaderPlugin/Task";
 import type { VisibleTaskSettings, TaskSortType } from "./state";
 import { assertNever, recordKeys } from "./lang";
 
 const EXPLICIT_TASK_FILTER_TO_NORMAL_TYPES: {
-  [K in "downloading" | "uploading" | "completed"]: DownloadStationTaskNormalStatus[];
+  [K in "downloading" | "uploading" | "completed"]: DownloaderPluginTaskNormalStatus[];
 } = {
-  downloading: ["downloading", "extracting", "finishing", "hash_checking"],
+  downloading: ["downloading"],
   uploading: ["seeding"],
   completed: ["finished"],
 };
@@ -26,12 +26,12 @@ const EXPLICIT_TASK_FILTER_TO_NORMAL_TYPES: {
 
 const EXPLICITLY_SPECIFIED_TYPES = recordKeys(EXPLICIT_TASK_FILTER_TO_NORMAL_TYPES).reduce(
   (acc, key) => acc.concat(EXPLICIT_TASK_FILTER_TO_NORMAL_TYPES[key]),
-  [] as DownloadStationTaskNormalStatus[],
+  [] as DownloaderPluginTaskNormalStatus[],
 );
 
 const ERRORED_TYPES = (ALL_TASK_ERROR_STATUSES as (
-  | DownloadStationTaskNormalStatus
-  | DownloadStationTaskErrorStatus
+  | DownloaderPluginTaskNormalStatus
+  | DownloaderPluginTaskErrorStatus
 )[]).concat(["error"]);
 
 const OTHER_STATUSES = ALL_TASK_NORMAL_STATUSES.filter(
@@ -41,20 +41,20 @@ const OTHER_STATUSES = ALL_TASK_NORMAL_STATUSES.filter(
 
 const TASK_FILTER_TO_TYPES: Record<
   keyof VisibleTaskSettings,
-  (DownloadStationTaskNormalStatus | DownloadStationTaskErrorStatus)[]
+  (DownloaderPluginTaskNormalStatus | DownloaderPluginTaskErrorStatus)[]
 > = {
   ...EXPLICIT_TASK_FILTER_TO_NORMAL_TYPES,
   errored: ERRORED_TYPES,
   other: OTHER_STATUSES,
 };
 
-export function matchesFilter(task: DownloadStationTask, filterName: keyof VisibleTaskSettings) {
-  const status = task.downloading ? 'downloading' : (task.filesize > 0)  ? 'finished' : 'waiting';
+export function matchesFilter(task: DownloaderPluginTask, filterName: keyof VisibleTaskSettings) {
+  const status = task.downloading ? "downloading" : task.filesize > 0 ? "finished" : "waiting";
   return TASK_FILTER_TO_TYPES[filterName].indexOf(status) !== -1;
 }
 
 export function filterTasks(
-  tasks: DownloadStationTask[],
+  tasks: DownloaderPluginTask[],
   visibleTasks: VisibleTaskSettings,
   showInactiveTasks: boolean,
 ) {
@@ -69,18 +69,18 @@ export function filterTasks(
   );
 }
 
-function isActive(task: DownloadStationTask) {
+function isActive(task: DownloaderPluginTask) {
   return task.downloading;
 }
 
-// function fractionComplete(task: DownloadStationTask) {
+// function fractionComplete(task: DownloaderPluginTask) {
 //   return task.additional!.transfer!.size_downloaded / task.size;
 // }
 
 export function sortTasks(
-  tasks: DownloadStationTask[],
+  tasks: DownloaderPluginTask[],
   taskSortType: TaskSortType,
-): DownloadStationTask[] {
+): DownloaderPluginTask[] {
   switch (taskSortType) {
     case "name-asc":
       return sortBy(tasks, (t) => t.filename.toLocaleLowerCase());
@@ -97,10 +97,7 @@ export function sortTasks(
       //   ...sortBy(incomplete, (t) => -fractionComplete(t)),
       //   ...sortBy(completed, (t) => t.additional!.detail!.completed_time),
       // ];
-      return [
-        ...sortBy(incomplete, (t) => t),
-        ...sortBy(completed, (t) => t),
-      ];
+      return [...sortBy(incomplete, (t) => t), ...sortBy(completed, (t) => t)];
     }
 
     case "timestamp-completed-desc": {
@@ -112,10 +109,7 @@ export function sortTasks(
       //   ...sortBy(incomplete, (t) => -fractionComplete(t)),
       //   ...sortBy(completed, (t) => -t.additional!.detail!.completed_time),
       // ];
-      return [
-        ...sortBy(incomplete, (t) => t),
-        ...sortBy(completed, (t) => t),
-      ];
+      return [...sortBy(incomplete, (t) => t), ...sortBy(completed, (t) => t)];
     }
 
     case "timestamp-added-asc":

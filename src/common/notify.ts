@@ -14,7 +14,7 @@ export function notify(
   type: NotificationType = "regular",
   id: string = uniqueId("notification-"),
 ) {
-  browser.notifications.create(id, {
+  void browser.notifications.create(id, {
     type: "basic",
     title,
     message: message || "",

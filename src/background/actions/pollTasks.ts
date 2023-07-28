@@ -1,5 +1,5 @@
 import type { RequestManager } from "../requestManager";
-import { SynologyClient, ClientRequestResult } from "../../common/apis/synology";
+import { OMVClient, ClientRequestResult } from "../../common/apis/OpenMediaVault";
 import { getErrorForFailedResponse, getErrorForConnectionFailure } from "../../common/apis/errors";
 import type { CachedTasks, State } from "../../common/state";
 import { saveLastSevereError } from "../../common/errorHandlers";
@@ -12,7 +12,7 @@ function setCachedTasks(cachedTasks: Partial<CachedTasks>) {
   });
 }
 
-export async function pollTasks(api: SynologyClient, manager: RequestManager): Promise<void> {
+export async function pollTasks(api: OMVClient, manager: RequestManager): Promise<void> {
   const token = manager.startNewRequest();
 
   const cachedTasksInit: Partial<CachedTasks> = {
@@ -27,15 +27,7 @@ export async function pollTasks(api: SynologyClient, manager: RequestManager): P
     let response;
 
     try {
-      // HELLO THERE
-      //
-      // When changing what this requests, you almost certainly want to update STATE_VERSION.
-      response = await api.DownloadStation.Task.List({
-        offset: 0,
-        limit: -1,
-        additional: ["transfer", "detail"],
-        timeout: 20000,
-      });
+      response = await api.DownloaderPlugin.Task.List({ _timeout: 20000 });
     } catch (e) {
       saveLastSevereError(e, "error while fetching list of tasks");
       return;
@@ -70,7 +62,7 @@ export async function pollTasks(api: SynologyClient, manager: RequestManager): P
       }
     } else if (response.success) {
       await setCachedTasks({
-        tasks: response.data.tasks,
+        tasks: response.data.data,
         taskFetchFailureReason: null,
       });
     } else {

@@ -1,8 +1,9 @@
 import type { DiscriminateUnion, OmitStrict } from "../types";
-import type { DownloadStationInfoConfig } from "./synology/DownloadStation/Info";
+import type { ShareMgmtFolder } from "./OpenMediaVault/ShareMgmt/Folders";
 
 export interface SuccessMessageResponse<T> {
   success: true;
+  // [Sean Kelley]:
   // This field must be mandatory; if it isn't, type inference at usage sites can be unsafe because
   // it is too lenient with structural matching. The generic constraint does nothing if you can always
   // just leave all (or in this case, only) constrained values out entirely.
@@ -18,7 +19,7 @@ export type MessageResponse<T = undefined> = SuccessMessageResponse<T> | Failure
 export const MessageResponse = {
   is: (r: unknown | null | undefined): r is MessageResponse => {
     const m = r as MessageResponse | null | undefined;
-    return m != null && (m.success === true || (m.success === false && m.reason != null));
+    return m != null && (m.success || (!m.success && m.reason != null));
   },
 };
 
@@ -40,13 +41,8 @@ export interface PollTasks {
   type: "poll-tasks";
 }
 
-export interface PauseTask {
-  type: "pause-task";
-  taskId: string;
-}
-
-export interface ResumeTask {
-  type: "resume-task";
+export interface StartTask {
+  type: "start-task";
   taskId: string;
 }
 
@@ -55,18 +51,8 @@ export interface DeleteTasks {
   taskIds: string[];
 }
 
-export interface GetConfig {
-  type: "get-config";
-}
-
 export interface ListDirectories {
   type: "list-directories";
-}
-
-export interface Directory {
-  name: string;
-  description: string;
-  uuid: string;
 }
 
 export interface SetLoginPassword {
@@ -77,20 +63,16 @@ export interface SetLoginPassword {
 export type Message =
   | AddTasks
   | PollTasks
-  | PauseTask
-  | ResumeTask
+  | StartTask
   | DeleteTasks
-  | GetConfig
   | ListDirectories
   | SetLoginPassword;
 
 const MESSAGE_TYPES: Record<Message["type"], true> = {
   "add-tasks": true,
   "delete-tasks": true,
-  "pause-task": true,
   "poll-tasks": true,
-  "resume-task": true,
-  "get-config": true,
+  "start-task": true,
   "list-directories": true,
   "set-login-password": true,
 };
@@ -106,17 +88,15 @@ export const Message = {
 export type Result = {
   "add-tasks": void;
   "poll-tasks": void;
-  "pause-task": MessageResponse;
-  "resume-task": MessageResponse;
+  "start-task": MessageResponse;
   "delete-tasks": MessageResponse;
-  "get-config": MessageResponse<DownloadStationInfoConfig>;
-  "list-directories": MessageResponse<Directory[]>;
+  "list-directories": MessageResponse<ShareMgmtFolder[]>;
   "set-login-password": void;
 };
 
 function makeMessageOperations<T extends Message["type"], U extends any[]>(
   type: T,
-  payload: (...args: U) => OmitStrict<DiscriminateUnion<Message, "type", T>, "type">,
+  payload = (..._args: U) => ({} as OmitStrict<DiscriminateUnion<Message, "type", T>, "type">),
 ) {
   return {
     send: (...args: U) => {
@@ -135,13 +115,9 @@ export const AddTasks = makeMessageOperations("add-tasks", (options: AddTaskOpti
   options,
 }));
 
-export const PollTasks = makeMessageOperations("poll-tasks", () => ({}));
+export const PollTasks = makeMessageOperations("poll-tasks");
 
-export const PauseTask = makeMessageOperations("pause-task", (taskId: string) => ({
-  taskId,
-}));
-
-export const ResumeTask = makeMessageOperations("resume-task", (taskId: string) => ({
+export const StartTask = makeMessageOperations("start-task", (taskId: string) => ({
   taskId,
 }));
 
@@ -149,19 +125,20 @@ export const DeleteTasks = makeMessageOperations("delete-tasks", (taskIds: strin
   taskIds,
 }));
 
-export const GetConfig = makeMessageOperations("get-config", () => ({}));
-
-export const ListDirectories = makeMessageOperations("list-directories", () => ({}));
+export const ListDirectories = makeMessageOperations("list-directories");
 
 export const SetLoginPassword = makeMessageOperations("set-login-password", (password: string) => ({
   password,
 }));
 
 {
+  // [Sean Kelley]:
   // Compile-time check to make sure that these two different types that have to match, do.
+  // noinspection JSUnusedAssignment
   let _message: Message["type"] = (null as unknown) as keyof Result;
   let _result: keyof Result = (null as unknown) as Message["type"];
 
+  // [Sean Kelley]:
   // Get the compiler to shut up. These lines don't necessarily catch type errors.
   _message = _result;
   _result = _message;

@@ -1,3 +1,4 @@
+// noinspection ES6PreferShortImport
 import type { Settings, State } from "./migrations/latest";
 import { typesafeUnionMembers } from "../lang";
 
@@ -35,7 +36,7 @@ function attachSharedStateListener() {
     didAttachSingletonListener = true;
     browser.storage.onChanged.addListener((_changes: StorageChangeEvent<State>, areaName) => {
       if (areaName === "local") {
-        fetchStateAndNotify(stateListeners);
+        void fetchStateAndNotify(stateListeners);
       }
     });
   }
@@ -44,5 +45,5 @@ function attachSharedStateListener() {
 export function onStoredStateChange(listener: (state: State) => void) {
   attachSharedStateListener();
   stateListeners.push(listener);
-  fetchStateAndNotify([listener]);
+  void fetchStateAndNotify([listener]);
 }

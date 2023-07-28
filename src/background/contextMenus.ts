@@ -12,24 +12,21 @@ export function initializeContextMenus() {
     onclick: (data) => {
       const state = getMutableStateSingleton();
 
-      if (data.linkUrl) {
-        addDownloadTasksAndPoll(
+      if (data.linkUrl || data.srcUrl) {
+        void addDownloadTasksAndPoll(
           state.api,
           state.pollRequestManager,
           state.showNonErrorNotifications,
-          [data.linkUrl],
-        );
-      } else if (data.srcUrl) {
-        addDownloadTasksAndPoll(
-          state.api,
-          state.pollRequestManager,
-          state.showNonErrorNotifications,
-          [data.srcUrl],
+          {
+            urls: [data.linkUrl || data.srcUrl || ""],
+            path: "",
+          },
         );
       } else if (data.selectionText) {
         let urls = data.selectionText
           .split("\n")
           .map((url) => url.trim())
+          // [Sean Kelley]:
           // The cheapest of checks. Actual invalid URLs will be caught later.
           .filter((url) => startsWithAnyProtocol(url, ALL_DOWNLOADABLE_PROTOCOLS));
 
@@ -40,11 +37,14 @@ export function initializeContextMenus() {
             "failure",
           );
         } else {
-          addDownloadTasksAndPoll(
+          void addDownloadTasksAndPoll(
             state.api,
             state.pollRequestManager,
             state.showNonErrorNotifications,
-            urls,
+            {
+              urls,
+              path: "",
+            },
           );
         }
       } else {

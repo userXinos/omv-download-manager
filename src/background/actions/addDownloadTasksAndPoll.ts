@@ -1,19 +1,15 @@
-import { SynologyClient, ClientRequestResult } from "../../common/apis/synology";
+import { OMVClient, ClientRequestResult } from "../../common/apis/OpenMediaVault";
 import { getErrorForFailedResponse } from "../../common/apis/errors";
 import { saveLastSevereError } from "../../common/errorHandlers";
 import { assertNever } from "../../common/lang";
 import { notify } from "../../common/notify";
-import {
-  ALL_DOWNLOADABLE_PROTOCOLS,
-  EMULE_PROTOCOL,
-  startsWithAnyProtocol,
-} from "../../common/apis/protocols";
+import { ALL_DOWNLOADABLE_PROTOCOLS } from "../../common/apis/protocols";
 import { resolveUrl, ResolvedUrl, sanitizeUrlForSynology, guessFileNameFromUrl } from "./urls";
 import { pollTasks } from "./pollTasks";
 import type { UnionByDiscriminant } from "../../common/types";
 import type { AddTaskOptions } from "../../common/apis/messages";
 import type { RequestManager } from "../requestManager";
-import { DownloadStationTaskDLTYPE } from "../../common/apis/synology/DownloadStation/Task";
+import { DownloaderPluginTaskDlType } from "../../common/apis/OpenMediaVault/DownloaderPlugin/Task";
 
 type ArrayifyValues<T extends Record<string, any>> = {
   [K in keyof T]: T[K][];
@@ -21,20 +17,13 @@ type ArrayifyValues<T extends Record<string, any>> = {
 
 type ResolvedUrlByType = ArrayifyValues<UnionByDiscriminant<ResolvedUrl, "type">>;
 
-async function checkIfEMuleShouldBeEnabled(api: SynologyClient, urls: string[]) {
-  if (urls.some((url) => startsWithAnyProtocol(url, EMULE_PROTOCOL))) {
-    const result = await api.DownloadStation.Info.GetConfig();
-    if (ClientRequestResult.isConnectionFailure(result)) {
-      return false;
-    } else if (result.success) {
-      return !result.data.emule_enabled;
-    } else {
-      return false;
-    }
-  } else {
-    return false;
-  }
-}
+const hardcoreOpt = {
+  dltype: DownloaderPluginTaskDlType.ARIA2,
+  format: "",
+  parts: 20,
+  subtitles: false,
+  delete: false,
+};
 
 function reportUnexpectedError(
   notificationId: string | undefined,
@@ -55,7 +44,7 @@ function getFileNameFromUrl(url: string): string {
 }
 
 async function addOneTask(
-  api: SynologyClient,
+  api: OMVClient,
   pollRequestManager: RequestManager,
   showNonErrorNotifications: boolean,
   url: string,
@@ -84,29 +73,12 @@ async function addOneTask(
         );
       }
     } else {
-      let shouldEMuleBeEnabled;
-      try {
-        shouldEMuleBeEnabled = await checkIfEMuleShouldBeEnabled(api, [url]);
-      } catch (e) {
-        reportUnexpectedError(notificationId, e, "error while checking emule settings");
-        return;
-      }
-
-      if (shouldEMuleBeEnabled) {
-        notify(
-          browser.i18n.getMessage("eMule_is_not_enabled"),
-          browser.i18n.getMessage("Use_DSM_to_enable_eMule_downloads"),
-          "failure",
-          notificationId,
-        );
-      } else {
-        notify(
-          browser.i18n.getMessage("Failed_to_add_download"),
-          getErrorForFailedResponse(result),
-          "failure",
-          notificationId,
-        );
-      }
+      notify(
+        browser.i18n.getMessage("Failed_to_add_download"),
+        getErrorForFailedResponse(result),
+        "failure",
+        notificationId,
+      );
     }
   }
 
@@ -116,24 +88,14 @@ async function addOneTask(
 
   const resolvedUrl = await resolveUrl(url, undefined, undefined);
 
-  const commonCreateOptionsV1 = {
-    sharedfolderref: path,
-    dltype: DownloadStationTaskDLTYPE.ARIA2,
-    format: "",
-    parts: 20,
-    subtitles: false,
-    delete: false,
-  };
-
   if (resolvedUrl.type === "direct-download") {
     try {
       const fUrl = resolvedUrl.url.toString();
-      const result = await api.DownloadStation.Task.Create({
-        params: {
-          url: fUrl,
-          filename: getFileNameFromUrl(fUrl),
-          ...commonCreateOptionsV1,
-        },
+      const result = await api.DownloaderPlugin.Task.Create({
+        url: fUrl,
+        filename: getFileNameFromUrl(fUrl),
+        sharedfolderref: path,
+        ...hardcoreOpt,
       });
       await reportTaskAddResult(result, guessFileNameFromUrl(url));
       await pollTasks(api, pollRequestManager);
@@ -161,7 +123,7 @@ async function addOneTask(
 }
 
 async function addMultipleTasks(
-  api: SynologyClient,
+  api: OMVClient,
   pollRequestManager: RequestManager,
   showNonErrorNotifications: boolean,
   urls: string[],
@@ -195,9 +157,6 @@ async function addMultipleTasks(
     if (ClientRequestResult.isConnectionFailure(result)) {
       failures += count;
     } else if (result.success) {
-      // "success" doesn't mean the torrents are valid and downloading, it just means that the
-      // operation requested was completed, which might have added invalid torrents. So this
-      // is really just a best guess.
       successes += count;
     } else if (!result.success) {
       failures += count;
@@ -208,24 +167,15 @@ async function addMultipleTasks(
 
   failures += groupedUrls["missing-or-illegal"].length;
 
-  const commonCreateOptionsV1 = {
-    sharedfolderref: path,
-    dltype: DownloadStationTaskDLTYPE.ARIA2,
-    //format: string,
-    subtitles: false,
-    delete: false,
-  };
-
   if (groupedUrls["direct-download"].length > 0) {
     const urls = groupedUrls["direct-download"].map(({ url }) => sanitizeUrlForSynology(url));
     const results = urls.map((u) => {
       const fUrl = u.toString();
-      return api.DownloadStation.Task.Create({
-        params: {
-          url: fUrl,
-          filename: getFileNameFromUrl(fUrl),
-          ...commonCreateOptionsV1,
-        },
+      return api.DownloaderPlugin.Task.Create({
+        url: fUrl,
+        filename: getFileNameFromUrl(fUrl),
+        sharedfolderref: path,
+        ...hardcoreOpt,
       });
     });
     await Promise.all(
@@ -271,11 +221,11 @@ async function addMultipleTasks(
     );
   }
 
-  pollTasks(api, pollRequestManager);
+  void pollTasks(api, pollRequestManager);
 }
 
 export async function addDownloadTasksAndPoll(
-  api: SynologyClient,
+  api: OMVClient,
   pollRequestManager: RequestManager,
   showNonErrorNotifications: boolean,
   options: AddTaskOptions,

@@ -1,6 +1,8 @@
 import "./path-selector.scss";
 import * as React from "react";
-import type { MessageResponse, Directory } from "../common/apis/messages";
+import type { MessageResponse } from "../common/apis/messages";
+import type { ShareMgmtFolder } from "../common/apis/OpenMediaVault/ShareMgmt/Folders";
+import type { PopupClient } from "./popupClient";
 import {
   DirectoryTree,
   DirectoryTreeFile,
@@ -8,7 +10,6 @@ import {
   isLoadedChild,
   isErrorChild,
 } from "./DirectoryTree";
-import type { PopupClient } from "./popupClient";
 
 const ROOT_PATH = "/";
 
@@ -68,13 +69,13 @@ export class PathSelector extends React.PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    this.loadTopLevelDirectories();
+    void this.loadTopLevelDirectories();
   }
 
   componentDidUpdate(prevProps: Props) {
     if (this.props.client !== prevProps.client) {
       this.props.onSelectPath("");
-      this.loadTopLevelDirectories();
+      void this.loadTopLevelDirectories();
     }
   }
 
@@ -105,7 +106,7 @@ export class PathSelector extends React.PureComponent<Props, State> {
     }
   };
 
-  private updateTreeWithResponse(response: MessageResponse<Directory[]>) {
+  private updateTreeWithResponse(response: MessageResponse<ShareMgmtFolder[]>) {
     if (response.success) {
       this.setState((prev) => ({
         directoryTree: {

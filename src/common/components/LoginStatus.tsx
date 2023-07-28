@@ -3,7 +3,7 @@ import "./login-status.scss";
 import * as React from "react";
 import classNames from "classnames";
 
-import { ClientRequestResult } from "../apis/synology";
+import { ClientRequestResult } from "../apis/OpenMediaVault";
 import { getErrorForConnectionFailure, getErrorForFailedResponse } from "../apis/errors";
 import { assertNever } from "../lang";
 

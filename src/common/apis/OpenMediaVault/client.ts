@@ -1,33 +1,28 @@
 import { typesafeUnionMembers } from "../../lang";
 import { Auth, AuthLoginResponse } from "./Auth";
-import { DownloadStation } from "./DownloadStation";
-import { DownloadStation2 } from "./DownloadStation2";
-import { FileStation } from "./FileStation";
-import { Info } from "./Info";
+import { DownloaderPlugin } from "./DownloaderPlugin";
+import { ShareMgmt } from "./ShareMgmt";
 import {
   SessionName,
-  RestApiResponse,
-  RestApiFailureResponse,
+  RpcResponse,
+  RpcFailureResponse,
   BaseRequest,
   BadResponseError,
   TimeoutError,
   NetworkError,
 } from "./shared";
 
-const NO_PERMISSIONS_ERROR_CODE = 105;
-const SESSION_TIMEOUT_ERROR_CODE = 106;
-
-export interface SynologyClientSettings {
+export interface OMVClientSettings {
   baseUrl: string;
-  account: string;
-  passwd: string;
+  username: string;
+  password: string;
   session: SessionName;
 }
 
-const SETTING_NAME_KEYS = typesafeUnionMembers<keyof SynologyClientSettings>({
+const SETTING_NAME_KEYS = typesafeUnionMembers<keyof OMVClientSettings>({
   baseUrl: true,
-  account: true,
-  passwd: true,
+  username: true,
+  password: true,
   session: true,
 });
 
@@ -45,9 +40,7 @@ export type ConnectionFailure =
       error: any;
     };
 
-function isConnectionFailure(
-  v: SynologyClientSettings | ConnectionFailure,
-): v is ConnectionFailure {
+function isConnectionFailure(v: OMVClientSettings | ConnectionFailure): v is ConnectionFailure {
   return (v as ConnectionFailure).type != null;
 }
 
@@ -65,43 +58,45 @@ const ConnectionFailure = {
   },
 };
 
-export type ClientRequestResult<T> = RestApiResponse<T> | ConnectionFailure;
+export type ClientRequestResult<T> = RpcResponse<T> | ConnectionFailure;
 
 export const ClientRequestResult = {
   isConnectionFailure: (result: ClientRequestResult<unknown>): result is ConnectionFailure => {
-    return false;
+    return (
+      (result as ConnectionFailure).type != null && (result as RpcResponse<unknown>).success == null
+    );
   },
 };
 
-export class SynologyClient {
+export class OMVClient {
   private loginPromise: Promise<ClientRequestResult<AuthLoginResponse>> | undefined;
   private settingsVersion: number = 0;
 
-  constructor(private settings: Partial<SynologyClientSettings>) {}
+  constructor(private settings: Partial<OMVClientSettings>) {}
 
-  public partiallyUpdateSettings(settings: Partial<SynologyClientSettings>) {
+  public partiallyUpdateSettings(settings: Partial<OMVClientSettings>) {
     const updatedSettings = { ...this.settings, ...settings };
     if (SETTING_NAME_KEYS.some((k) => updatedSettings[k] !== this.settings[k])) {
       this.settingsVersion++;
       this.settings = updatedSettings;
-      this.maybeLogout();
+      void this.maybeLogout();
       return true;
     } else {
       return false;
     }
   }
 
-  private getValidatedSettings(): SynologyClientSettings | ConnectionFailure {
+  private getValidatedSettings(): OMVClientSettings | ConnectionFailure {
     const missingFields = SETTING_NAME_KEYS.filter((k) => {
       const v = this.settings[k];
-      return v == null || v.length === 0;
+      return v == null;
     });
     if (missingFields.length === 0) {
-      return this.settings as SynologyClientSettings;
+      return this.settings as OMVClientSettings;
     } else {
       return {
         type: "missing-config",
-        which: missingFields.length === 1 && missingFields[0] === "passwd" ? "password" : "other",
+        which: missingFields.length === 1 && missingFields[0] === "password" ? "password" : "other",
       };
     }
   }
@@ -115,14 +110,14 @@ export class SynologyClient {
       this.loginPromise = Auth.Login(baseUrl, {
         ...request,
         ...restSettings,
-        version: 2,
       }).catch((e) => ConnectionFailure.from(e));
     }
 
     return this.loginPromise;
   };
 
-  // Note that this method is a BEST EFFORT.
+  // [Sean Kelley]:
+  // Note that this method is the BEST EFFORT.
   // (1) Because the client auto-re-logs in when you make new queries, this method will attempt to
   //     only log out the current session. The next non-logout call is guaranteed to attempt to log
   //     back in.
@@ -144,14 +139,9 @@ export class SynologyClient {
       const response = await stashedLoginPromise;
       if (ClientRequestResult.isConnectionFailure(response)) {
         return response;
-      } else if (response.data.authenticated) {
-        const { baseUrl, session } = settings;
+      } else if (response.success && response.data.authenticated) {
         try {
-          return await Auth.Logout(baseUrl, {
-            ...request,
-            session: session,
-            params: null,
-          });
+          return await Auth.Logout(settings.baseUrl, { ...request });
         } catch (e) {
           return ConnectionFailure.from(e);
         }
@@ -161,8 +151,13 @@ export class SynologyClient {
     }
   };
 
+  public Auth = {
+    Login: this.maybeLogin,
+    Logout: this.maybeLogout,
+  };
+
   private proxy<T, U>(
-    fn: (baseUrl: string, options: T) => Promise<RestApiResponse<U>>,
+    fn: (baseUrl: string, options: T) => Promise<RpcResponse<U>>,
   ): (options: T) => Promise<ClientRequestResult<U>> {
     const wrappedFunction = async (
       options: T,
@@ -171,14 +166,10 @@ export class SynologyClient {
       const versionAtInit = this.settingsVersion;
 
       const maybeLogoutAndRetry = async (
-        result: ConnectionFailure | RestApiFailureResponse,
+        result: ConnectionFailure | RpcFailureResponse,
       ): Promise<ClientRequestResult<U>> => {
-        if (
-          shouldRetryRoutineFailures &&
-          (ClientRequestResult.isConnectionFailure(result) ||
-            result.error.code === SESSION_TIMEOUT_ERROR_CODE ||
-            result.error.code === NO_PERMISSIONS_ERROR_CODE)
-        ) {
+        // TODO handle login errors here
+        if (shouldRetryRoutineFailures && ClientRequestResult.isConnectionFailure(result)) {
           this.loginPromise = undefined;
           return wrappedFunction(options, false);
         } else {
@@ -187,6 +178,7 @@ export class SynologyClient {
       };
 
       try {
+        // [Sean Kelley]:
         // `await`s in this block aren't necessary to adhere to the type signature, but it changes
         // who's responsible for handling the errors. Currently, errors unhandled by lower levels
         // are bubbled up to this outermost `catch`.
@@ -217,69 +209,23 @@ export class SynologyClient {
   }
 
   private proxyOptionalArgs<T, U>(
-    fn: (baseUrl: string, options?: T) => Promise<RestApiResponse<U>>,
+    fn: (baseUrl: string, options?: T) => Promise<RpcResponse<U>>,
   ): (options?: T) => Promise<ClientRequestResult<U>> {
     return this.proxy(fn);
   }
 
-  private proxyWithoutAuth<T, U>(
-    fn: (baseUrl: string, options: T) => Promise<RestApiResponse<U>>,
-  ): (options: T) => Promise<ClientRequestResult<U>> {
-    return async (options: T) => {
-      const settings = this.getValidatedSettings();
-      if (isConnectionFailure(settings)) {
-        return settings;
-      } else {
-        try {
-          // TODO: This should do the same settings-version-checking that `this.proxy` does.
-          return await fn(settings.baseUrl, options);
-        } catch (e) {
-          return ConnectionFailure.from(e);
-        }
-      }
-    };
-  }
-
-  public Auth = {
-    Login: this.maybeLogin,
-    Logout: this.maybeLogout,
-  };
-
-  public Info = {
-    Query: this.proxyWithoutAuth(Info.Query),
-  };
-
-  public DownloadStation = {
-    Info: {
-      GetInfo: this.proxyOptionalArgs(DownloadStation.Info.GetInfo),
-      GetConfig: this.proxyOptionalArgs(DownloadStation.Info.GetConfig),
-      SetServerConfig: this.proxy(DownloadStation.Info.SetServerConfig),
-    },
+  public DownloaderPlugin = {
     Task: {
-      List: this.proxyOptionalArgs(DownloadStation.Task.List),
-      GetInfo: this.proxy(DownloadStation.Task.GetInfo),
-      Create: this.proxy(DownloadStation.Task.Create),
-      Delete: this.proxy(DownloadStation.Task.Delete),
-      Pause: this.proxy(DownloadStation.Task.Pause),
-      Resume: this.proxy(DownloadStation.Task.Resume),
-      Edit: this.proxy(DownloadStation.Task.Edit),
+      List: this.proxy(DownloaderPlugin.Task.List),
+      Create: this.proxy(DownloaderPlugin.Task.Create),
+      Start: this.proxy(DownloaderPlugin.Task.Start),
+      Delete: this.proxy(DownloaderPlugin.Task.Delete),
     },
   };
 
-  public DownloadStation2 = {
-    Task: {
-      Create: this.proxy(DownloadStation2.Task.Create),
-    },
-  };
-
-  public FileStation = {
-    Info: {
-      get: this.proxy(FileStation.Info.get),
-    },
-    List: {
-      list_share: this.proxyOptionalArgs(FileStation.List.list_share),
-      list: this.proxy(FileStation.List.list),
-      getinfo: this.proxy(FileStation.List.getinfo),
+  public ShareMgmt = {
+    Folders: {
+      list: this.proxyOptionalArgs(ShareMgmt.Folders.list),
     },
   };
 }

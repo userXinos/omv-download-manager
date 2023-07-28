@@ -1,5 +1,5 @@
 import { Task } from "./Task";
 
-export const DownloadStation2 = {
+export const DownloaderPlugin = {
   Task,
 };

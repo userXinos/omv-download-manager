@@ -1,6 +1,6 @@
 import { default as isEqual } from "lodash/isEqual";
 import { getMutableStateSingleton } from "./backgroundState";
-import { SessionName } from "../common/apis/synology";
+import { SessionName } from "../common/apis/OpenMediaVault";
 import { getHostUrl, State } from "../common/state";
 import { notify } from "../common/notify";
 import { pollTasks, clearCachedTasks } from "./actions";
@@ -14,8 +14,9 @@ export function onStoredStateChange(storedState: State) {
 
   let didUpdateSettings = backgroundState.api.partiallyUpdateSettings({
     baseUrl: getHostUrl(storedState.settings.connection),
-    account: storedState.settings.connection.username,
-    session: SessionName.DownloadStation,
+    username: storedState.settings.connection.username,
+    session: SessionName.DOWNLOADER_PLUGIN,
+    // [Sean Kelley]:
     // Do NOT set password from here. It might not be set because of the "remember me" feature, so
     // we could erroneously overwrite it. Instead, read it once at startup time (if configured), and
     // otherwise, wait for an imperative login request message to be handled elsewhere.
@@ -25,13 +26,14 @@ export function onStoredStateChange(storedState: State) {
     // Note the ordering here: avoid short-circuiting.
     didUpdateSettings =
       backgroundState.api.partiallyUpdateSettings({
-        passwd: storedState.settings.connection.password,
+        password: storedState.settings.connection.password,
       }) || didUpdateSettings;
   }
 
   if (didUpdateSettings) {
     const clearCachePromise = clearCachedTasks();
 
+    // [Sean Kelley]:
     // This is a little bit of a hack, but basically: onStoredStateChange eagerly fires this
     // listener when it initializes. That first time through, the client gets initialized for the
     // first time, and so we necessarily clear and reload. However, if the user hasn't configured
@@ -41,7 +43,7 @@ export function onStoredStateChange(storedState: State) {
     if (!backgroundState.isInitializingExtension) {
       // Don't use await because we want this to fire in the background.
       clearCachePromise.then(() => {
-        pollTasks(backgroundState.api, backgroundState.pollRequestManager);
+        void pollTasks(backgroundState.api, backgroundState.pollRequestManager);
       });
     }
   }
@@ -51,7 +53,7 @@ export function onStoredStateChange(storedState: State) {
     clearInterval(backgroundState.notificationInterval!);
     if (backgroundState.lastNotificationSettings.enableCompletionNotifications) {
       backgroundState.notificationInterval = (setInterval(() => {
-        pollTasks(backgroundState.api, backgroundState.pollRequestManager);
+        void pollTasks(backgroundState.api, backgroundState.pollRequestManager);
       }, backgroundState.lastNotificationSettings.completionPollingInterval * 1000) as any) as number;
     }
   }
@@ -60,7 +62,7 @@ export function onStoredStateChange(storedState: State) {
     storedState.settings.notifications.enableFeedbackNotifications;
 
   if (storedState.taskFetchFailureReason) {
-    browser.browserAction.setIcon({
+    void browser.browserAction.setIcon({
       path: {
         "16": "icons/icon-16-disabled.png",
         "32": "icons/icon-32-disabled.png",
@@ -76,7 +78,7 @@ export function onStoredStateChange(storedState: State) {
 
     browser.browserAction.setBadgeBackgroundColor({ color: [217, 0, 0, 255] });
   } else {
-    browser.browserAction.setIcon({
+    void browser.browserAction.setIcon({
       path: {
         "16": "icons/icon-16.png",
         "32": "icons/icon-32.png",
@@ -117,17 +119,17 @@ export function onStoredStateChange(storedState: State) {
     storedState.taskFetchFailureReason == null
   ) {
     const updatedFinishedTaskIds = storedState.tasks
-      .filter((t) => t.status === "finished" || t.status === "seeding")
-      .map((t) => t.id);
+      .filter((t) => !t.downloading && t.filesize > 0)
+      .map((t) => t.uuid);
     if (
       backgroundState.finishedTaskIds != null &&
       storedState.settings.notifications.enableCompletionNotifications
     ) {
       updatedFinishedTaskIds
-        .filter((id) => !backgroundState.finishedTaskIds!.has(id))
-        .forEach((id) => {
-          const task = storedState.tasks.find((t) => t.id === id)!;
-          notify(`${task.title}`, browser.i18n.getMessage("Download_finished"));
+        .filter((i) => !backgroundState.finishedTaskIds!.has(i))
+        .forEach((i) => {
+          const task = storedState.tasks.find((t) => t.uuid === i)!;
+          notify(`${task.filename}`, browser.i18n.getMessage("Download_finished"));
         });
     }
     backgroundState.finishedTaskIds = new Set(updatedFinishedTaskIds);
