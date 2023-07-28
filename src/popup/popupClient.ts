@@ -19,7 +19,7 @@ import { testConnection } from "../common/apis/connection";
 
 export interface PopupClient {
   openDownloadStationUi: () => void;
-  createTasks: (options?: AddTaskOptions) => void;
+  createTasks: (options: AddTaskOptions) => void;
   pauseTask: (taskId: string) => Promise<MessageResponse>;
   resumeTask: (taskId: string) => Promise<MessageResponse>;
   deleteTasks: (taskIds: string[]) => Promise<MessageResponse>;
@@ -34,7 +34,7 @@ export function getClient(settings: ConnectionSettings): PopupClient | undefined
     return {
       openDownloadStationUi: () => {
         browser.tabs.create({
-          url: hostUrl + "/index.cgi?launchApp=SYNO.SDS.DownloadStation.Application",
+          url: hostUrl + "/#/services/downloader",
           active: true,
         });
       },

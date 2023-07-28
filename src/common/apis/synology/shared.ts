@@ -204,18 +204,16 @@ export class ApiBuilder {
     method: typeof get | typeof post,
     methodName: string,
     params: Params | null,
-    preprocess?: (options: object) => object,
-    postprocess?: (response: object) => object,
+    preprocess = (o: object) => o,
+    postprocess = (o: object) => o,
   ) {
-    preprocess = preprocess || ((o) => o);
-    postprocess = postprocess || ((r) => r);
     return async (baseUrl: string, sid: string, options?: object) => {
       const response = await method(baseUrl, this.cgiName, {
         ...preprocess!(options || {}),
+        params,
         service: this.apiName,
         version: 1,
         method: methodName,
-        params,
         sid,
         meta: this.meta,
       });
