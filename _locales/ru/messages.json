@@ -28,14 +28,6 @@
     "message": "Пожалуйста, проверьте свои настройки",
     "description": "Основной текст уведомления."
   },
-  "eMule_is_not_enabled": {
-    "message": "eMule не включен",
-    "description": "Название уведомления."
-  },
-  "Use_DSM_to_enable_eMule_downloads": {
-    "message": "Используйте DSM для включения загрузки eMule",
-    "description": "Основной текст уведомления."
-  },
   "Failed_to_add_download": {
     "message": "Не удалось добавить загрузку",
     "description": "Название уведомления."
@@ -157,14 +149,6 @@
   "Resume": {
     "message": "Продолжить",
     "description": "Подсказка для кнопки возобновить в элементе списка задач."
-  },
-  "Start_seeding": {
-    "message": "Запустить раздачу",
-    "description": "Всплывающая подсказка для кнопки начала раздачи в элементе списка задач."
-  },
-  "Pause": {
-    "message": "Приостановить",
-    "description": "Подсказка для кнопки паузы в элементе списка задач."
   },
   "ZpercentZ_ZestimateZ_ZcurrentZ_of_ZtotalZ_at_ZspeedZ": {
     "message": "$PERCENT$ \u2013 $ESTIMATE$ \u2013 $CURRENT$ из $TOTAL$ на $SPEED$",

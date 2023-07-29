@@ -28,14 +28,6 @@
     "message": "Veuillez vérifier vos réglages",
     "description": "Notification body text."
   },
-  "eMule_is_not_enabled": {
-    "message": "eMule n'est pas activé",
-    "description": "Notification title."
-  },
-  "Use_DSM_to_enable_eMule_downloads": {
-    "message": "Utilisez DSM pour activer les téléchargements eMule",
-    "description": "Notification body text."
-  },
   "Failed_to_add_download": {
     "message": "L'ajout du téléchargement a échoué",
     "description": "Notification title."
@@ -161,14 +153,6 @@
   "Resume": {
     "message": "Reprendre",
     "description": "Tooltip for resume button on a task list item."
-  },
-  "Start_seeding": {
-    "message": "Partage (seeding)",
-    "description": "Tooltip for start-seeding button on a task list item."
-  },
-  "Pause": {
-    "message": "Pause",
-    "description": "Tooltip for pause button on a task list item."
   },
   "ZpercentZ_ZestimateZ_ZcurrentZ_of_ZtotalZ_at_ZspeedZ": {
     "message": "$PERCENT$ \u2013 $ESTIMATE$ \u2013 $CURRENT$ sur $TOTAL$ à $SPEED$",

@@ -47,16 +47,16 @@ export interface DownloaderPluginTask {
   uuid: string;
   filename: string;
   url: string;
-  dltype: DownloaderPluginTaskDlType;
+  dltype?: DownloaderPluginTaskDlType;
   downloading: boolean;
   filesize: number;
-  parts: number;
-  format: string;
-  keepvideo: string;
-  subtitles: boolean;
-  sharedfoldername: string;
+  parts?: number;
+  format?: string;
+  keepvideo?: string;
+  subtitles?: boolean;
+  sharedfoldername?: string;
   sharedfolderref: string;
-  delete: boolean;
+  delete?: boolean;
 }
 
 export interface DownloaderPluginTaskCreateRequest extends BaseRequest {

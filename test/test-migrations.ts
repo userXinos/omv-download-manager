@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { cloneDeep } from "lodash";
 
-import type { DownloadStationTask } from "../src/common/apis/synology/DownloadStation/Task";
+import type { DownloaderPluginTask } from "../src/common/apis/OpenMediaVault/DownloaderPlugin/Task";
 import { migrateState } from "../src/common/state/migrations/update";
 import type { State as State_1 } from "../src/common/state/migrations/1";
 import type { State as State_2 } from "../src/common/state/migrations/2";
@@ -31,7 +31,7 @@ interface PreVersioningState_0 {
     enabled: boolean;
     pollingInterval: number;
   };
-  tasks: DownloadStationTask[];
+  tasks: DownloaderPluginTask[];
   taskFetchFailureReason: "missing-config" | { failureMessage: string } | null;
   tasksLastInitiatedFetchTimestamp: number | null;
   tasksLastCompletedFetchTimestamp: number | null;
@@ -51,13 +51,13 @@ interface PreVersioningState_1 extends PreVersioningState_0 {
   cachedTasksVersion?: number;
 }
 
-const DUMMY_TASK: DownloadStationTask = {
-  id: "id",
-  type: "http",
-  username: "username",
-  title: "title",
-  size: 0,
-  status: "downloading",
+const DUMMY_TASK: DownloaderPluginTask = {
+  uuid: "id",
+  filename: "title",
+  url: "url",
+  sharedfolderref: "sharedfolderref",
+  filesize: 0,
+  downloading: false,
 };
 
 function testMigration<T>(before: T, after: State_7) {

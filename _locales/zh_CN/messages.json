@@ -28,14 +28,6 @@
     "message": "请检查您的配置",
     "description": "Notification body text."
   },
-  "eMule_is_not_enabled": {
-    "message": "eMule 功能未启用",
-    "description": "Notification title."
-  },
-  "Use_DSM_to_enable_eMule_downloads": {
-    "message": "在 Download Station 中开启 eMule 下载支持",
-    "description": "Notification body text."
-  },
   "Failed_to_add_download": {
     "message": "添加下载失败",
     "description": "Notification title."
@@ -165,14 +157,6 @@
   "Resume": {
     "message": "恢复任务",
     "description": "Tooltip for resume button on a task list item."
-  },
-  "Start_seeding": {
-    "message": "开始做种",
-    "description": "Tooltip for start-seeding button on a task list item."
-  },
-  "Pause": {
-    "message": "暂停任务",
-    "description": "Tooltip for pause button on a task list item."
   },
   "ZpercentZ_ZestimateZ_ZcurrentZ_of_ZtotalZ_at_ZspeedZ": {
     "message": "$PERCENT$ \u2013 $ESTIMATE$ \u2013 已下载$CURRENT$ 总计$TOTAL$ 速度$SPEED$",
@@ -525,7 +509,7 @@
     "description": "Error message on Synology API call failure."
   },
   "Session_interrupted_by_duplicate_login": {
-    "message": "登录会话被重复登录关闭", 
+    "message": "登录会话被重复登录关闭",
     "description": "Error message on Synology API call failure."
   },
   "SID_not_found": {
