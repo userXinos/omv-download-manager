@@ -9,14 +9,9 @@ export interface DownloaderPluginTaskListRequest extends BaseRequest {
   limit?: number;
 }
 
-export interface DownloaderPluginDataListResponse {
-  total: number;
-  data: DownloaderPluginTask[];
-}
-
 export interface DownloaderPluginTaskListResponse {
   total: number;
-  tasks: DownloaderPluginTask[];
+  data: DownloaderPluginTask[];
 }
 
 export const __taskNormalStatuses = {
@@ -87,10 +82,10 @@ const taskBuilder = new ApiBuilder(SERVICE_NAME);
 export const Task = {
   SERVICE_NAME: SERVICE_NAME,
 
-  List: taskBuilder.makePost<DownloaderPluginTaskListRequest, DownloaderPluginDataListResponse>(
+  List: taskBuilder.makePost<DownloaderPluginTaskListRequest, DownloaderPluginTaskListResponse>(
     "getDownloadList",
     (o) => ({ limit: -1, start: 0, ...o }),
-    (r) => ({ ...r, tasks: r.data }),
+    (o) => o,
     true,
   ),
   Create: taskBuilder.makePost<DownloaderPluginTaskCreateRequest, DownloaderPluginTask>(
