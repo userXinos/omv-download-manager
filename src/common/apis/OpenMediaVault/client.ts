@@ -3,7 +3,6 @@ import { Auth, AuthLoginResponse } from "./Auth";
 import { DownloaderPlugin } from "./DownloaderPlugin";
 import { ShareMgmt } from "./ShareMgmt";
 import {
-  SessionName,
   RpcResponse,
   RpcFailureResponse,
   BaseRequest,
@@ -16,14 +15,12 @@ export interface OMVClientSettings {
   baseUrl: string;
   username: string;
   password: string;
-  session: SessionName;
 }
 
 const SETTING_NAME_KEYS = typesafeUnionMembers<keyof OMVClientSettings>({
   baseUrl: true,
   username: true,
   password: true,
-  session: true,
 });
 
 export type ConnectionFailure =

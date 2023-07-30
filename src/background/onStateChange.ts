@@ -1,6 +1,5 @@
 import { default as isEqual } from "lodash/isEqual";
 import { getMutableStateSingleton } from "./backgroundState";
-import { SessionName } from "../common/apis/OpenMediaVault";
 import { getHostUrl, State } from "../common/state";
 import { notify } from "../common/notify";
 import { pollTasks, clearCachedTasks } from "./actions";
@@ -15,7 +14,6 @@ export function onStoredStateChange(storedState: State) {
   let didUpdateSettings = backgroundState.api.partiallyUpdateSettings({
     baseUrl: getHostUrl(storedState.settings.connection),
     username: storedState.settings.connection.username,
-    session: SessionName.DOWNLOADER_PLUGIN,
     // [Sean Kelley]:
     // Do NOT set password from here. It might not be set because of the "remember me" feature, so
     // we could erroneously overwrite it. Instead, read it once at startup time (if configured), and

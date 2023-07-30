@@ -1,15 +1,14 @@
 import { ConnectionSettings, getHostUrl } from "../state";
-import { ClientRequestResult, SessionName, OMVClient } from "./OpenMediaVault";
+import { ClientRequestResult, OMVClient } from "./OpenMediaVault";
 
 export async function testConnection(settings: ConnectionSettings) {
   const api = new OMVClient({
     baseUrl: getHostUrl(settings),
     username: settings.username,
     password: settings.password,
-    session: SessionName.DOWNLOADER_PLUGIN,
   });
 
-  const loginResult = await api.Auth.Login({ _timeout: 30000 });
+  const loginResult = await api.Auth.Login({ _timeout: 30000, _credentials: "omit" });
   if (
     !ClientRequestResult.isConnectionFailure(loginResult) &&
     loginResult.success &&
