@@ -91,16 +91,11 @@ export const Task = {
   Create: taskBuilder.makePost<DownloaderPluginTaskCreateRequest, DownloaderPluginTask>(
     "setDownload",
     (o) => ({ ...o, uuid: UUID_TOKEN }),
-    (r) => r,
   ),
   Start: taskBuilder.makePost<DownloaderPluginTaskByIdRequest, DownloaderPluginTaskStartResponse>(
     "doDownloadBg",
-    (o) => o,
-    (o) => o,
   ),
   Delete: taskBuilder.makePost<DownloaderPluginTaskByIdRequest, DownloaderPluginTask>(
     "deleteDownload",
-    (o) => o,
-    (o) => o,
   ),
 };

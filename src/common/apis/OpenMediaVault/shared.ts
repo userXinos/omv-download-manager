@@ -122,7 +122,7 @@ export class ApiBuilder {
     methodName: string,
     preprocess?: (options: I) => object,
     postprocess?: (response: O) => O,
-  ): (baseUrl: string, options?: I) => Promise<RpcResponse<O>>;
+  ): (baseUrl: string, options: I) => Promise<RpcResponse<O>>;
   makePost<I extends BaseRequest, O>(
     methodName: string,
     preprocess: ((options: I) => object) | undefined,

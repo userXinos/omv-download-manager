@@ -221,6 +221,9 @@ export class OMVClient {
       Start: this.proxy(DownloaderPlugin.Task.Start),
       Delete: this.proxy(DownloaderPlugin.Task.Delete),
     },
+    Info: {
+      Get: this.proxyOptionalArgs(DownloaderPlugin.Info.Get),
+    },
   };
 
   public ShareMgmt = {

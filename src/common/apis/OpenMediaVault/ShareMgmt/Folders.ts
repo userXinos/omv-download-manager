@@ -24,5 +24,8 @@ export const Folders = {
 
   list: listBuilder.makePost<ShareMgmtFoldersListRequest, ShareMgmtFolder[]>(
     "enumerateSharedFolders",
+    (o) => o,
+    (o) => o,
+    true,
   ),
 };
