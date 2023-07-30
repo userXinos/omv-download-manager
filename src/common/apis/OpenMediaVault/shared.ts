@@ -8,18 +8,13 @@ export class BadResponseError extends Error {
 export class TimeoutError extends Error {}
 export class NetworkError extends Error {}
 
-export enum SessionName {
-  DOWNLOADER_PLUGIN,
-  SHARE_MGMT,
-}
-
 export interface RpcParams {
   [p: string]: unknown;
 }
 
 export interface GroupMeta {
   service: string;
-  method?: string;
+  method: string;
 }
 
 export interface RequestMeta extends GroupMeta {}
@@ -36,7 +31,8 @@ export interface RpcFailureResponse {
   success: false;
   error: {
     code: number;
-    errors?: any[];
+    message: string;
+    trace: string;
   };
   _meta: ResponseMeta;
 }
@@ -45,6 +41,7 @@ export type RpcResponse<S> = RpcSuccessResponse<S> | RpcFailureResponse;
 
 export interface BaseRequest {
   _timeout?: number;
+  _credentials?: "same-origin" | "include" | "omit";
 }
 
 export interface RpcRequest extends BaseRequest {
@@ -68,14 +65,16 @@ async function fetchWithErrorHandling(
 
   try {
     const response = await fetch(url, {
-      ...init,
       credentials: "same-origin",
       signal: abortController.signal,
+      ...init,
     });
     if (!response.ok) {
+      // response.error.code - useless (always zero),
+      // OMV for localization uses sentences
       return {
         success: false,
-        error: response,
+        error: await response.json().then((r) => ({ ...r.error, code: response.status })),
       };
     } else {
       return {
@@ -100,11 +99,12 @@ export async function post<O extends object>(
   baseUrl: string,
   request: RpcRequest,
 ): Promise<RpcResponse<O>> {
-  const { _timeout, ...body } = request;
+  const { _timeout, _credentials, ...body } = request;
   const url = `${baseUrl}/rpc.php`;
   const init = {
     method: "POST",
     headers: new Headers({ "Content-Type": "application/json" }),
+    credentials: _credentials,
     body: JSON.stringify({ ...body }),
   };
   const response = (await fetchWithErrorHandling(url, init, _timeout)) as Promise<RpcResponse<O>>;

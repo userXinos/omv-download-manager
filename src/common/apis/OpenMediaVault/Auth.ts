@@ -20,18 +20,26 @@ function Login(
   baseUrl: string,
   options: AuthLoginRequest,
 ): Promise<RpcResponse<AuthLoginResponse>> {
+  const { _timeout, _credentials, ...params } = options;
+
   return post(baseUrl, {
     method: "login",
     service: SERVICE_NAME,
-    params: { ...options },
+    _timeout,
+    _credentials,
+    params: { ...params },
   });
 }
 
 function Logout(baseUrl: string, options: AuthLogoutRequest): Promise<RpcResponse<{}>> {
+  const { _timeout, _credentials, ...params } = options;
+
   return post(baseUrl, {
     method: "logout",
     service: SERVICE_NAME,
-    params: { ...options },
+    _timeout,
+    _credentials,
+    params: { ...params },
   }).then((res) => {
     deleteAllCookies();
     return res as RpcResponse<{}>;

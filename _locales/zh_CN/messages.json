@@ -484,72 +484,16 @@
     "message": "未知错误",
     "description": "Error message on Synology API call failure."
   },
-  "Invalid_parameter": {
-    "message": "非法参数",
-    "description": "Error message on Synology API call failure."
-  },
-  "The_requested_API_does_not_exist": {
-    "message": "请求的接口不存在",
-    "description": "Error message on Synology API call failure."
-  },
   "The_requested_method_does_not_exist": {
     "message": "请求的方法不存在",
-    "description": "Error message on Synology API call failure."
-  },
-  "The_requested_version_does_not_support_this_functionality": {
-    "message": "请求的版本不支持此功能",
     "description": "Error message on Synology API call failure."
   },
   "The_logged_in_session_does_not_have_permission": {
     "message": "登录的用户会话无操作权限",
     "description": "Error message on Synology API call failure."
   },
-  "Session_timeout": {
-    "message": "登录会话超时",
-    "description": "Error message on Synology API call failure."
-  },
-  "Session_interrupted_by_duplicate_login": {
-    "message": "登录会话被重复登录关闭",
-    "description": "Error message on Synology API call failure."
-  },
-  "SID_not_found": {
-    "message": "无SID",
-    "description": "Error message on Synology API call failure."
-  },
   "No_such_username_or_incorrect_password": {
     "message": "用户名或密码错误",
-    "description": "Error message on Synology API call failure."
-  },
-  "Account_disabled": {
-    "message": "账户已禁用",
-    "description": "Error message on Synology API call failure."
-  },
-  "Permission_denied": {
-    "message": "无权限",
-    "description": "Error message on Synology API call failure."
-  },
-  "Twostep_verification_needed": {
-    "message": "需要2步骤验证",
-    "description": "Error message on Synology API call failure."
-  },
-  "Twostep_verification_failed": {
-    "message": "2步骤验证失败",
-    "description": "Error message on Synology API call failure."
-  },
-  "File_upload_failed": {
-    "message": "文件上传出错",
-    "description": "Error message on Synology API call failure."
-  },
-  "Max_number_of_tasks_reached": {
-    "message": "已达到最大任务限制",
-    "description": "Error message on Synology API call failure."
-  },
-  "Destination_denied": {
-    "message": "目的地文件夹被拒绝",
-    "description": "Error message on Synology API call failure."
-  },
-  "Destination_does_not_exist": {
-    "message": "目的地文件夹不存在",
     "description": "Error message on Synology API call failure."
   },
   "Invalid_task_ID": {
@@ -562,106 +506,6 @@
   },
   "No_default_destination_is_set_in_Download_Station_for_this_Synology_user": {
     "message": "此用户尚未在 Download Station 中设置目的地文件夹",
-    "description": "Error message on Synology API call failure."
-  },
-  "Set_destination_failed": {
-    "message": "设置目的地文件夹失败",
-    "description": "Error message on Synology API call failure."
-  },
-  "File_does_not_exist": {
-    "message": "文件不存在",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_parameter_of_file_operation": {
-    "message": "参数或操作错误",
-    "description": "Error message on Synology API call failure."
-  },
-  "Unknown_error_of_file_operation": {
-    "message": "未知文件操作错误",
-    "description": "Error message on Synology API call failure."
-  },
-  "System_is_too_busy": {
-    "message": "系统繁忙",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_user_does_this_file_operation": {
-    "message": "当前用户无法完成此操作",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_group_does_this_file_operation": {
-    "message": "当前用户组无法完成此操作",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_user_and_group_does_this_file_operation": {
-    "message": "当前用户（组）无法完成此操作",
-    "description": "Error message on Synology API call failure."
-  },
-  "Cant_get_usergroup_information_from_the_account_server": {
-    "message": "无法获取用户（组）信息",
-    "description": "Error message on Synology API call failure."
-  },
-  "Operation_not_permitted": {
-    "message": "操作未被允许",
-    "description": "Error message on Synology API call failure."
-  },
-  "No_such_file_or_directory": {
-    "message": "文件（夹）不存在",
-    "description": "Error message on Synology API call failure."
-  },
-  "Nonsupported_file_system": {
-    "message": "不支持的文件系统",
-    "description": "Error message on Synology API call failure."
-  },
-  "Failed_to_connect_internetbased_file_system_ex_CIFS": {
-    "message": "无法连接基于 Internet 的文件系统（如：CIFS）",
-    "description": "Error message on Synology API call failure."
-  },
-  "Readonly_file_system": {
-    "message": "文件系统只读",
-    "description": "Error message on Synology API call failure."
-  },
-  "Filename_too_long_in_the_nonencrypted_file_system": {
-    "message": "在不加密的文件系统中文件名过长",
-    "description": "Error message on Synology API call failure."
-  },
-  "Filename_too_long_in_the_encrypted_file_system": {
-    "message": "在加密的文件系统中文件名过长",
-    "description": "Error message on Synology API call failure."
-  },
-  "File_already_exists": {
-    "message": "文件已存在",
-    "description": "Error message on Synology API call failure."
-  },
-  "Disk_quota_exceeded": {
-    "message": "已达最大磁盘配额",
-    "description": "Error message on Synology API call failure."
-  },
-  "No_space_left_on_device": {
-    "message": "磁盘空间不足",
-    "description": "Error message on Synology API call failure."
-  },
-  "Inputoutput_error": {
-    "message": "IO错误",
-    "description": "Error message on Synology API call failure."
-  },
-  "Illegal_name_or_path": {
-    "message": "非法文件路径",
-    "description": "Error message on Synology API call failure."
-  },
-  "Illegal_file_name": {
-    "message": "非法文件名",
-    "description": "Error message on Synology API call failure."
-  },
-  "Illegal_file_name_on_FAT_file_system": {
-    "message": "非法的FAT文件系统名称",
-    "description": "Error message on Synology API call failure."
-  },
-  "Device_or_resource_busy": {
-    "message": "设备或资源忙",
-    "description": "Error message on Synology API call failure."
-  },
-  "No_such_task_of_the_file_operation": {
-    "message": "无操作对应的任务",
     "description": "Error message on Synology API call failure."
   },
   "Loading_directories": {
