@@ -1,7 +1,8 @@
 {
   "name": "nas-download-manager",
   "version": "0.0.0",
-  "description": "An open source browser extension for adding/managing download tasks to your Synology DiskStation.",
+  "description": "An open source browser extension for adding/managing download tasks to your OpenMediaVault.",
+  "author": "Sean Kelley and Xinos",
   "scripts": {
     "test": "TS_NODE_PROJECT=test/tsconfig-test.json mocha --require ts-node/register 'test/**/*.{ts,tsx}'",
     "lint": "prettier --check src/**/* && tsc -p src --noemit",

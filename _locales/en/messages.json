@@ -1,6 +1,6 @@
 {
-  "Add_and_manage_Download_Station_tasks_on_your_Synology_DiskStation": {
-    "message": "Add and manage Download Station tasks on your Synology DiskStation.",
+  "Add_and_manage_Downloader_tasks_on_your_OpenMediaVault": {
+    "message": "Add and manage Downloader tasks on your OpenMediaVault.",
     "description": "A description of the extension.",
     "test_skip_reference_check": true
   },

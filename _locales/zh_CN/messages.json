@@ -1,6 +1,6 @@
 {
-  "Add_and_manage_Download_Station_tasks_on_your_Synology_DiskStation": {
-    "message": "添加和管理群晖 Download Station 下载任务",
+  "Add_and_manage_Downloader_tasks_on_your_OpenMediaVault": {
+    "message": "添加和管理 Downloader OpenMediaVault 下载任务",
     "description": "A description of the extension.",
     "test_skip_reference_check": true
   },
