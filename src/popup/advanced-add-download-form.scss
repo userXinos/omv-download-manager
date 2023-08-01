@@ -1,4 +1,5 @@
 @import "colors";
+@import "common";
 
 .advanced-add-download-form {
   display: flex;
@@ -7,7 +8,6 @@
   .card {
     border-radius: 2px;
     border: 1px solid #aaa;
-    background-color: white;
   }
 
   .url-input {

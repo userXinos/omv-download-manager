@@ -1,7 +1,21 @@
+@import "colors";
+
 * {
   box-sizing: border-box;
 }
 
-body {
+body, html {
   padding: 4px 2px;
+  background-color: $color-background;
+  color: $color-text;
+
+  scrollbar-color: #6e6e6e $color-background;
+
+  ::-webkit-scrollbar {
+    background: $color-background;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #6e6e6e;
+    border-radius: 4px;
+  }
 }

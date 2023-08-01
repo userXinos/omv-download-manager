@@ -55,7 +55,7 @@ export class Task extends React.PureComponent<Props, State> {
                 unknown: matchesFilter(this.props.task, "other"),
               })}
               // style={{ width: `${(isErrored ? 1 : this.computeFractionComplete()) * 100}%` }}
-              style={{ width: `${(isErrored ? 1 : 0) * 100}%` }}
+              style={{ width: `${(isErrored ? 0 : 1) * 100}%` }}
             />
             <div className="bar-background" />
           </div>

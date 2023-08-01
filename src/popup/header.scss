@@ -1,6 +1,7 @@
 @import "colors";
 
 header {
+  background-color: $color-header;
   flex-shrink: 0;
   white-space: nowrap;
   display: flex;

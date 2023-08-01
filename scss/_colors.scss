@@ -1,13 +1,15 @@
-$color-error: #c23030;
-$color-warning: #d99e0b;
-$color-success: #0d8050;
-$color-loading: #137cbd;
+$color-error: #f2293b;
+$color-warning: #f49c22;
+$color-success: #63dd65;
+$color-loading: #6facde;
 $color-selected: $color-loading;
 $color-indeterminate: #888;
-$color-background: #fbfbfb;
+$color-background: #303030;
 
-$color-text: #111;
-$color-text-faded: #444;
+$color-text: #ffffff;
+$color-text-faded: #b4b4b4;
+
+$color-header: #6facde;
 
 .intent-error {
   color: $color-error;
