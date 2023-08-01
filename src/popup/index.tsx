@@ -12,12 +12,12 @@ import { PollTasks } from "../common/apis/messages";
 const ELEMENT = document.getElementById("body")!;
 
 function updateSettings(settings: Settings) {
-  browser.storage.local.set<Partial<State>>({ settings });
+  void browser.storage.local.set<Partial<State>>({ settings });
 }
 
-PollTasks.send();
+void PollTasks.send();
 setInterval(() => {
-  PollTasks.send();
+  void PollTasks.send();
 }, 10000);
 
 onStoredStateChange((storedState) => {

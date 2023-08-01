@@ -3,7 +3,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { default as throttle } from "lodash/throttle";
 
-import type { DownloadStationTask } from "../common/apis/synology/DownloadStation/Task";
+import type { DownloaderPluginTask } from "../common/apis/OpenMediaVault/DownloaderPlugin/Task";
 import type { VisibleTaskSettings, TaskSortType, BadgeDisplayType } from "../common/state";
 import { sortTasks, filterTasks } from "../common/filtering";
 import { TaskFilterSettingsForm } from "../common/components/TaskFilterSettingsForm";
@@ -16,7 +16,7 @@ import { Task } from "./Task";
 import { PasswordForm } from "./PasswordForm";
 
 export interface Props {
-  tasks: DownloadStationTask[];
+  tasks: DownloaderPluginTask[];
   taskFetchFailureReason: "missing-config" | "login-required" | { failureMessage: string } | null;
   tasksLastInitiatedFetchTimestamp: number | null;
   tasksLastCompletedFetchTimestamp: number | null;
@@ -56,8 +56,8 @@ export class Popup extends React.PureComponent<Props, State> {
 
   render() {
     const completedTaskIds = this.props.tasks
-      .filter((t) => t.status === "finished")
-      .map((t) => t.id);
+      .filter((t) => !t.downloading && t.filesize > 0)
+      .map((t) => t.uuid);
     const onClickClearTasks = this.props.client
       ? async () => {
           this.setState({ isClearingCompletedTasks: true });
@@ -189,11 +189,10 @@ export class Popup extends React.PureComponent<Props, State> {
             <ul>
               {sortTasks(filteredTasks, this.props.taskSort).map((task) => (
                 <Task
-                  key={task.id}
+                  key={task.uuid}
                   task={task}
                   onDelete={deleteTask}
-                  onPause={this.props.client?.pauseTask}
-                  onResume={this.props.client?.resumeTask}
+                  onStart={this.props.client?.startTask}
                 />
               ))}
             </ul>

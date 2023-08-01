@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "NAS Download Manager (for Synology)",
-  "version": "0.12.1",
-  "description": "__MSG_Add_and_manage_Download_Station_tasks_on_your_Synology_DiskStation__",
+  "name": "NAS Download Manager (for OpenMediaVault)",
+  "version": "0.1.0",
+  "description": "__MSG_Add_and_manage_Downloader_tasks_on_your_OpenMediaVault__",
   "default_locale": "en",
   "background": {
     "scripts": [

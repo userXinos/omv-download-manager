@@ -1,37 +1,34 @@
-# NAS Download Manager
+# NAS Download Manager (for OpenMediaVault)
+An open source browser extension for adding/managing download tasks to your OpenMediaVault.
 
-> An open source browser extension for adding/managing download tasks to your Synology DiskStation.
-
-[![Donate](https://img.shields.io/badge/Donate%20$2-PayPal-brightgreen.svg)](https://paypal.me/downloadmanager/2)
-
-## 🔧 Maintenance Mode 🔧
-
-NAS Download Manager is in maintenance mode. See [the announcement](https://github.com/seansfkelley/nas-download-manager/issues/227) for details.
+#
+> [Fork](https://github.com/seansfkelley/nas-download-manager) of the Synology addon developed by [Sean Kelley](https://github.com/seansfkelley)
+>
+> [![Donate](https://img.shields.io/badge/Donate%20$2-PayPal-brightgreen.svg)](https://paypal.me/downloadmanager/2)
+#
 
 ## Having an Issue?
 
-If you're here because of an issue with the extension, please check the [FAQ](./FAQ.md) first. If you can't find an answer there, feel free to [open an issue](https://github.com/seansfkelley/nas-download-manager/issues)!
+If you're here because of an issue with the extension, please check the [FAQ](./FAQ.md) first. If you can't find an answer there, feel free to [open an issue](https://github.com/userXinos/omv-download-manager/issues)!
 
 ## About
 
-NAS Download Manager allows you to add and manage your download tasks on your Synology DiskStation right from your browser. It requires a Synology NAS with DSM version 4 or higher.
+NAS Download Manager allows you to add and manage your download tasks on your OpenMediaVault right from your browser. It requires a OpenMediaVault 6 with Downloader plugin from OMV-Extras.
 
-Please note that NAS Download Manager is not an official Synology offering.
+If you don't have OMV-Extras installed, use this [installation guide](https://forum.openmediavault.org/index.php?thread/5549-omv-extras-org-plugin). Then, in the OMV web interface, install the Downloader plugin via System -> Plugins.
 
 ### Features
 
-- Right-click and download many types of media (`<video>` and `<audio>` tags) and files (e.g. `.torrent` files).
 - Clear all completed tasks with one click.
 - Choose destination folder for new download tasks.
 - View, filter and sort all the current download tasks in the extension popup.
-- Add/pause/resume/remove download tasks in the extension popup.
+- Add/start/remove download tasks in the extension popup.
 - System notifications for completed download tasks.
-- Open some types of links (e.g. `magnet:`) in the extension rather than a desktop application.
 
 ### Officially Supported Browsers
 
-- Firefox ([view listing](https://addons.mozilla.org/en-US/firefox/addon/nas-download-manager/))
-- Chrome ([view listing](https://chrome.google.com/webstore/detail/nas-download-manager/iaijiochiiocodhamehbpmdlobhgghgi))
+- Firefox ([view listing]())
+- Chrome ([view listing]())
 
 ### Browsers Reported to Work
 
@@ -78,9 +75,9 @@ Please note that while the build tasks will auto-recompile, the browser may not 
 
 3. In your browser, navigate to the extension debugging page and open `manifest.json`.
 
-    **Firefox**: `about:debugging` > This Firefox > Load Temporary Add-on...
+   **Firefox**: `about:debugging` > This Firefox > Load Temporary Add-on...
 
-    **Chrome**: `about:extensions` > Enable "Developer mode" > Load unpacked
+   **Chrome**: `about:extensions` > Enable "Developer mode" > Load unpacked
 
 ### Packing the Extension for Distribution
 

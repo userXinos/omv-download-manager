@@ -8,8 +8,9 @@ export type DirectoryTreeFileChildren =
   | DirectoryTreeFile[];
 
 export interface DirectoryTreeFile {
+  uuid: string;
   name: string;
-  path: string;
+  description: string;
   children: DirectoryTreeFileChildren;
 }
 
@@ -29,41 +30,11 @@ export function isLoadedChild(
   return !isUnloadedChild(children) && !isErrorChild(children);
 }
 
-export function recursivelyUpdateDirectoryTree(
-  currentNode: DirectoryTreeFile,
-  path: string,
-  newChildren: DirectoryTreeFileChildren,
-): DirectoryTreeFile {
-  if (currentNode.path === path) {
-    return {
-      ...currentNode,
-      children: newChildren,
-    };
-  } else if (!isLoadedChild(currentNode.children)) {
-    console.error(
-      `programmer error: tried to update tree at ${path} but ancestor ${currentNode.path} has no valid children; ancestor:`,
-      currentNode,
-    );
-    return currentNode;
-  } else {
-    return {
-      ...currentNode,
-      children: currentNode.children.map((child) => {
-        if (path.startsWith(child.path)) {
-          return recursivelyUpdateDirectoryTree(child, path, newChildren);
-        } else {
-          return child;
-        }
-      }),
-    };
-  }
-}
-
 export interface Props {
   file: DirectoryTreeFile;
   selectedPath?: string;
   requestLoad: (path: string) => void;
-  onSelect: (path: string | undefined) => void;
+  onSelect: (path: string) => void;
 }
 
 export interface State {
@@ -88,7 +59,7 @@ export class DirectoryTree extends React.PureComponent<Props, State> {
       <div className="directory-tree">
         <div
           className={classNames("directory-header", {
-            "is-selected": this.props.selectedPath === this.props.file.path,
+            "is-selected": this.props.selectedPath === this.props.file.uuid,
           })}
         >
           <div
@@ -115,7 +86,7 @@ export class DirectoryTree extends React.PureComponent<Props, State> {
             />
           </div>
           <div className="name" onClick={this.onSelect} title={this.props.file.name}>
-            {this.props.file.name}
+            {this.props.file.description}
           </div>
         </div>
         {this.renderChildren()}
@@ -124,22 +95,22 @@ export class DirectoryTree extends React.PureComponent<Props, State> {
   }
 
   private onSelect = () => {
-    this.props.onSelect(this.props.file.path);
+    this.props.onSelect(this.props.file.uuid);
   };
 
   private toggleExpanded = () => {
     const isExpanded = !this.state.isExpanded;
     this.setState({ isExpanded });
     if (isExpanded && isUnloadedChild(this.props.file.children)) {
-      this.props.requestLoad(this.props.file.path);
+      this.props.requestLoad(this.props.file.uuid);
     }
 
     if (
       !isExpanded &&
       this.props.selectedPath &&
-      this.props.selectedPath.startsWith(this.props.file.path)
+      this.props.selectedPath.startsWith(this.props.file.uuid)
     ) {
-      this.props.onSelect(undefined);
+      this.props.onSelect("");
     }
   };
 
@@ -156,7 +127,7 @@ export class DirectoryTree extends React.PureComponent<Props, State> {
           <ul className="children loaded">
             {this.props.file.children.map((child) => (
               <DirectoryTree
-                key={child.path}
+                key={child.uuid}
                 file={child}
                 requestLoad={this.props.requestLoad}
                 selectedPath={this.props.selectedPath}

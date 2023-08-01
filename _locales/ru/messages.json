@@ -1,6 +1,6 @@
 {
-  "Add_and_manage_Download_Station_tasks_on_your_Synology_DiskStation": {
-    "message": "Добавляйте и управляйте задачами Download Station на сервере Synology DiskStation.",
+  "Add_and_manage_Downloader_tasks_on_your_OpenMediaVault": {
+    "message": "Добавляйте и управляйте задачами загрузки Downloader на сервере OpenMediaVault.",
     "description": "Описание расширения.",
     "test_skip_reference_check": true
   },
@@ -26,14 +26,6 @@
   },
   "Please_check_your_settings": {
     "message": "Пожалуйста, проверьте свои настройки",
-    "description": "Основной текст уведомления."
-  },
-  "eMule_is_not_enabled": {
-    "message": "eMule не включен",
-    "description": "Название уведомления."
-  },
-  "Use_DSM_to_enable_eMule_downloads": {
-    "message": "Используйте DSM для включения загрузки eMule",
     "description": "Основной текст уведомления."
   },
   "Failed_to_add_download": {
@@ -157,14 +149,6 @@
   "Resume": {
     "message": "Продолжить",
     "description": "Подсказка для кнопки возобновить в элементе списка задач."
-  },
-  "Start_seeding": {
-    "message": "Запустить раздачу",
-    "description": "Всплывающая подсказка для кнопки начала раздачи в элементе списка задач."
-  },
-  "Pause": {
-    "message": "Приостановить",
-    "description": "Подсказка для кнопки паузы в элементе списка задач."
   },
   "ZpercentZ_ZestimateZ_ZcurrentZ_of_ZtotalZ_at_ZspeedZ": {
     "message": "$PERCENT$ \u2013 $ESTIMATE$ \u2013 $CURRENT$ из $TOTAL$ на $SPEED$",
@@ -457,68 +441,16 @@
     "message": "Неизвестная ошибка.",
     "description": "Сообщение об ошибке при сбое вызова Synology API."
   },
-  "Invalid_parameter": {
-    "message": "Неверный параметр.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "The_requested_API_does_not_exist": {
-    "message": "Запрашиваемый API не существует.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
   "The_requested_method_does_not_exist": {
     "message": "Запрашиваемый метод не существует.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "The_requested_version_does_not_support_this_functionality": {
-    "message": "Запрошенная функция не поддерживает эту версию.",
     "description": "Сообщение об ошибке при сбое вызова Synology API."
   },
   "The_logged_in_session_does_not_have_permission": {
     "message": "Вход в сеанс не имеет разрешения.",
     "description": "Сообщение об ошибке при сбое вызова Synology API."
   },
-  "Session_timeout": {
-    "message": "Вышло время сеанса.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Session_interrupted_by_duplicate_login": {
-    "message": "Сессия прервана повторным входом в систему.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
   "No_such_username_or_incorrect_password": {
     "message": "Такого имени пользователя не существует или неверный пароль.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Account_disabled": {
-    "message": "Учетная запись отключена.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Permission_denied": {
-    "message": "Доступ запрещен.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Twostep_verification_needed": {
-    "message": "Требуется двухэтапная проверка.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Twostep_verification_failed": {
-    "message": "Двухэтапная проверка не удалась.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "File_upload_failed": {
-    "message": "Ошибка загрузки файла.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Max_number_of_tasks_reached": {
-    "message": "Достигнуто максимальное количество выполненных задач.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Destination_denied": {
-    "message": "Место назначения отклонено.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Destination_does_not_exist": {
-    "message": "Место назначения не существует.",
     "description": "Сообщение об ошибке при сбое вызова Synology API."
   },
   "Invalid_task_ID": {
@@ -533,105 +465,5 @@
     "message": "Нет места назначения по умолчанию.",
     "description": "Сообщение об ошибке при сбое вызова Synology API.",
     "needs_update": true
-  },
-  "Set_destination_failed": {
-    "message": "Не удалось установить места назначения.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "File_does_not_exist": {
-    "message": "Файла не существует.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Invalid_parameter_of_file_operation": {
-    "message": "Недопустимый параметр работы с файлом.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Unknown_error_of_file_operation": {
-    "message": "Неизвестная ошибка работы с файлом.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "System_is_too_busy": {
-    "message": "Система слишком занята.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Invalid_user_does_this_file_operation": {
-    "message": "Недопустимый пользователь выполняет эту операцию с файлом.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Invalid_group_does_this_file_operation": {
-    "message": "Недопустимая группа выполняет эту операцию с файлом.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Invalid_user_and_group_does_this_file_operation": {
-    "message": "Недопустимый пользователь и группа выполняет эту операцию с файлом.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Cant_get_usergroup_information_from_the_account_server": {
-    "message": "Не удается получить информацию о пользователе/группе с сервера учетных записей.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Operation_not_permitted": {
-    "message": "Операция не разрешена.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "No_such_file_or_directory": {
-    "message": "Нет такого файла или каталога.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Nonsupported_file_system": {
-    "message": "Файловая система не поддерживается.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Failed_to_connect_internetbased_file_system_ex_CIFS": {
-    "message": "Не удалось подключить файловую систему на базе Интернета (например: CIFS).",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Readonly_file_system": {
-    "message": "Файловая система только для чтения.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Filename_too_long_in_the_nonencrypted_file_system": {
-    "message": "Имя файла слишком длинное в незашифрованной файловой системе.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Filename_too_long_in_the_encrypted_file_system": {
-    "message": "Имя файла слишком длинное в зашифрованной файловой системе.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "File_already_exists": {
-    "message": "Файл уже существует.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Disk_quota_exceeded": {
-    "message": "Превышена дисковая квота.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "No_space_left_on_device": {
-    "message": "На устройстве не осталось места.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Inputoutput_error": {
-    "message": "Ошибка ввода/вывода.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Illegal_name_or_path": {
-    "message": "Неверное имя или путь.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Illegal_file_name": {
-    "message": "Неверное имя файла.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Illegal_file_name_on_FAT_file_system": {
-    "message": "Illegal file name on FAT file system.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "Device_or_resource_busy": {
-    "message": "Устройство или ресурс занят.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
-  },
-  "No_such_task_of_the_file_operation": {
-    "message": "Нет такой задачи работы с файлом.",
-    "description": "Сообщение об ошибке при сбое вызова Synology API."
   }
 }

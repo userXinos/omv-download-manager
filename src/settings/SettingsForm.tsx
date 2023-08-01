@@ -216,7 +216,7 @@ export class SettingsForm extends React.PureComponent<Props, State> {
   }
 
   private updateTaskTypeVisibility = (taskType: keyof VisibleTaskSettings, visibility: boolean) => {
-    this.saveSettings({
+    void this.saveSettings({
       visibleTasks: {
         ...this.props.extensionState.settings.visibleTasks,
         [taskType]: visibility,
@@ -225,15 +225,15 @@ export class SettingsForm extends React.PureComponent<Props, State> {
   };
 
   private updateTaskSortType = (taskSortType: TaskSortType) => {
-    this.saveSettings({ taskSortType });
+    void this.saveSettings({ taskSortType });
   };
 
   private updateBadgeDisplayType = (badgeDisplayType: BadgeDisplayType) => {
-    this.saveSettings({ badgeDisplayType });
+    void this.saveSettings({ badgeDisplayType });
   };
 
   private updateShowInactiveTasks = (showInactiveTasks: boolean) => {
-    this.saveSettings({ showInactiveTasks });
+    void this.saveSettings({ showInactiveTasks });
   };
 
   private updateConnectionSettings = async (
@@ -251,7 +251,7 @@ export class SettingsForm extends React.PureComponent<Props, State> {
     key: K,
     value: NotificationSettings[K],
   ) {
-    this.saveSettings({
+    void this.saveSettings({
       notifications: {
         ...this.props.extensionState.settings.notifications,
         [key]: value,
@@ -260,7 +260,7 @@ export class SettingsForm extends React.PureComponent<Props, State> {
   }
 
   private setShouldHandleDownloadLinks(shouldHandleDownloadLinks: boolean) {
-    this.saveSettings({
+    void this.saveSettings({
       shouldHandleDownloadLinks,
     });
   }

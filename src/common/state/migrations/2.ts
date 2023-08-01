@@ -1,6 +1,6 @@
 // TODO: This should re-define the properties that are interesting on the type, otherwise
 // this migration is not safe from changes made to the imported typed in the future.
-import type { DownloadStationTask } from "../../../common/apis/synology/DownloadStation/Task";
+import type { DownloaderPluginTask } from "../../apis/OpenMediaVault/DownloaderPlugin/Task";
 import type { OmitStrict } from "../../types";
 
 import {
@@ -28,7 +28,7 @@ export interface Settings {
 }
 
 export interface CachedTasks {
-  tasks: DownloadStationTask[];
+  tasks: DownloaderPluginTask[];
   taskFetchFailureReason: "missing-config" | { failureMessage: string } | null;
   tasksLastInitiatedFetchTimestamp: number | null;
   tasksLastCompletedFetchTimestamp: number | null;

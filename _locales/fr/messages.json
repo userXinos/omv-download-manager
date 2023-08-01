@@ -1,6 +1,6 @@
 {
-  "Add_and_manage_Download_Station_tasks_on_your_Synology_DiskStation": {
-    "message": "Ajoutez et gérez les tâches de Download Station sur votre DiskStation Synology.",
+  "Add_and_manage_Downloader_tasks_on_your_OpenMediaVault": {
+    "message": "Ajoutez et gérez les tâches de Downloader sur votre OpenMediaVault.",
     "description": "A description of the extension.",
     "test_skip_reference_check": true
   },
@@ -26,14 +26,6 @@
   },
   "Please_check_your_settings": {
     "message": "Veuillez vérifier vos réglages",
-    "description": "Notification body text."
-  },
-  "eMule_is_not_enabled": {
-    "message": "eMule n'est pas activé",
-    "description": "Notification title."
-  },
-  "Use_DSM_to_enable_eMule_downloads": {
-    "message": "Utilisez DSM pour activer les téléchargements eMule",
     "description": "Notification body text."
   },
   "Failed_to_add_download": {
@@ -161,14 +153,6 @@
   "Resume": {
     "message": "Reprendre",
     "description": "Tooltip for resume button on a task list item."
-  },
-  "Start_seeding": {
-    "message": "Partage (seeding)",
-    "description": "Tooltip for start-seeding button on a task list item."
-  },
-  "Pause": {
-    "message": "Pause",
-    "description": "Tooltip for pause button on a task list item."
   },
   "ZpercentZ_ZestimateZ_ZcurrentZ_of_ZtotalZ_at_ZspeedZ": {
     "message": "$PERCENT$ \u2013 $ESTIMATE$ \u2013 $CURRENT$ sur $TOTAL$ à $SPEED$",
@@ -477,68 +461,16 @@
     "message": "Erreur inconnue.",
     "description": "Error message on Synology API call failure."
   },
-  "Invalid_parameter": {
-    "message": "Paramètre incorrect.",
-    "description": "Error message on Synology API call failure."
-  },
-  "The_requested_API_does_not_exist": {
-    "message": "L'API requise n'existe pas.",
-    "description": "Error message on Synology API call failure."
-  },
   "The_requested_method_does_not_exist": {
     "message": "La méthode requise n'existe pas.",
-    "description": "Error message on Synology API call failure."
-  },
-  "The_requested_version_does_not_support_this_functionality": {
-    "message": "La version requise ne supporte pas cette fonctionnalité.",
     "description": "Error message on Synology API call failure."
   },
   "The_logged_in_session_does_not_have_permission": {
     "message": "La session connectée ne possède pas les autorisations.",
     "description": "Error message on Synology API call failure."
   },
-  "Session_timeout": {
-    "message": "La session a expiré.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Session_interrupted_by_duplicate_login": {
-    "message": "La session a été interrompue par une connexion redondante.",
-    "description": "Error message on Synology API call failure."
-  },
   "No_such_username_or_incorrect_password": {
     "message": "Nom d'utilisateur ou mot de passe incorrect.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Account_disabled": {
-    "message": "Compte désactivé.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Permission_denied": {
-    "message": "Permission refusée.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Twostep_verification_needed": {
-    "message": "Vérification en deux étapes requise.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Twostep_verification_failed": {
-    "message": "La vérification en deux étapes a échoué.",
-    "description": "Error message on Synology API call failure."
-  },
-  "File_upload_failed": {
-    "message": "L'envoi du fichier a échoué.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Max_number_of_tasks_reached": {
-    "message": "Nombre maximal de tâches atteint.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Destination_denied": {
-    "message": "Destination refusée.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Destination_does_not_exist": {
-    "message": "Cette destination n'existe pas.",
     "description": "Error message on Synology API call failure."
   },
   "Invalid_task_ID": {
@@ -551,106 +483,6 @@
   },
   "No_default_destination_is_set_in_Download_Station_for_this_Synology_user": {
     "message": "Aucune destination par défaut n'est spécifiée dans Download Station pour cet utilisateur Synology.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Set_destination_failed": {
-    "message": "Échec du réglage de la destination.",
-    "description": "Error message on Synology API call failure."
-  },
-  "File_does_not_exist": {
-    "message": "Le fichier n'existe pas.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_parameter_of_file_operation": {
-    "message": "Paramètre ou opération de fichier incorrects.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Unknown_error_of_file_operation": {
-    "message": "Erreur inconnue d'opération de fichier.",
-    "description": "Error message on Synology API call failure."
-  },
-  "System_is_too_busy": {
-    "message": "Le système est surchargé.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_user_does_this_file_operation": {
-    "message": "Un utilisateur incorrect effectue cette opération de fichier.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_group_does_this_file_operation": {
-    "message": "Un groupe incorrect effectue cette opération de fichier.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Invalid_user_and_group_does_this_file_operation": {
-    "message": "Un utilisateur et un groupe incorrects effectuent cette opération de fichier.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Cant_get_usergroup_information_from_the_account_server": {
-    "message": "Impossible d'obtenir l'information utilisateur/groupe depuis le compte du serveur.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Operation_not_permitted": {
-    "message": "Opération non autorisée.",
-    "description": "Error message on Synology API call failure."
-  },
-  "No_such_file_or_directory": {
-    "message": "Ce fichier ou répertoire n'existe pas.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Nonsupported_file_system": {
-    "message": "Système de fichiers non supporté.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Failed_to_connect_internetbased_file_system_ex_CIFS": {
-    "message": "Échec de la connexion au système de fichiers depuis Internet (ex : CIFS).",
-    "description": "Error message on Synology API call failure."
-  },
-  "Readonly_file_system": {
-    "message": "Système de fichiers en lecture seule.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Filename_too_long_in_the_nonencrypted_file_system": {
-    "message": "Nom de fichier trop long dans le système de fichiers non chiffré.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Filename_too_long_in_the_encrypted_file_system": {
-    "message": "Nom de fichier trop long dans le système de fichiers chiffré.",
-    "description": "Error message on Synology API call failure."
-  },
-  "File_already_exists": {
-    "message": "Le fichier existe déjà.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Disk_quota_exceeded": {
-    "message": "Quota de disque dépassé.",
-    "description": "Error message on Synology API call failure."
-  },
-  "No_space_left_on_device": {
-    "message": "Plus assez d'espace disponible sur l'appareil.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Inputoutput_error": {
-    "message": "Erreur d'entrée/sortie.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Illegal_name_or_path": {
-    "message": "Nom ou chemin incorrect.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Illegal_file_name": {
-    "message": "Nom de fichier incorrect.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Illegal_file_name_on_FAT_file_system": {
-    "message": "Nom de fichier incorrect sur un système de fichiers FAT.",
-    "description": "Error message on Synology API call failure."
-  },
-  "Device_or_resource_busy": {
-    "message": "L'appareil ou la ressource est occupée.",
-    "description": "Error message on Synology API call failure."
-  },
-  "No_such_task_of_the_file_operation": {
-    "message": "Aucune opération de fichier de ce type.",
     "description": "Error message on Synology API call failure."
   },
   "Loading_directories": {

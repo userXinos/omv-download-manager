@@ -11,7 +11,7 @@ function clearError() {
   const clearedError: Logging = {
     lastSevereError: undefined,
   };
-  browser.storage.local.set<Partial<State>>(clearedError);
+  void browser.storage.local.set<Partial<State>>(clearedError);
 }
 
 async function saveSettings(settings: Settings): Promise<boolean> {

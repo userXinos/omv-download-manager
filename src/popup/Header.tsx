@@ -20,7 +20,7 @@ export interface Props {
 export function Header(props: Props) {
   return (
     <header className={classNames({ "with-shadow": props.showDropShadow })}>
-      <img src={props.disabledLogo ? "/icons/icon-64-disabled.png" : "/icons/icon-64.png"} />
+      <img src={props.disabledLogo ? "/icons/icon-64-disabled.png" : "/icons/icon-64.png"} alt="" />
       <span className="extension-name">NAS Download Manager</span>
       <button
         onClick={props.onClickAddDownload}
@@ -65,7 +65,7 @@ export function Header(props: Props) {
       </button>
       <button
         onClick={() => {
-          browser.runtime.openOptionsPage();
+          void browser.runtime.openOptionsPage();
         }}
         title={browser.i18n.getMessage("Open_settings")}
         className={classNames({ "called-out": props.isMissingConfig })}

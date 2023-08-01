@@ -17,5 +17,5 @@ ${e.stack ? "Error stack trace: " + e.stack.trim() : "(no error stack)"}`
   const logging: Logging = {
     lastSevereError: formattedError,
   };
-  browser.storage.local.set<Partial<State>>(logging);
+  void browser.storage.local.set<Partial<State>>(logging);
 }
