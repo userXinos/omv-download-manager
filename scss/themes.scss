@@ -1,0 +1,30 @@
+.dark-theme {
+  --color-background: #303030;
+  --color-text: #ffffff;
+  --color-text-faded: #b4b4b4;
+
+  @at-root button {
+    backdrop-filter: brightness(1.5);
+
+    &:not(.disabled):not(:disabled) {
+      &:hover {
+        backdrop-filter: brightness(1.2);
+      }
+    }
+  }
+}
+.light-theme {
+  --color-background: #fafafa;
+  --color-text: #202020;
+  --color-text-faded: #818181;
+
+  @at-root button {
+    backdrop-filter: brightness(0.8);
+
+    &:not(.disabled):not(:disabled) {
+      &:hover {
+        backdrop-filter: brightness(0.6);
+      }
+    }
+  }
+}

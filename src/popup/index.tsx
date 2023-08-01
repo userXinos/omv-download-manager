@@ -10,6 +10,7 @@ import { PopupWrapper } from "./PopupWrapper";
 import { PollTasks } from "../common/apis/messages";
 
 const ELEMENT = document.getElementById("body")!;
+const HTML = document.getElementsByTagName("html")[0];
 
 function updateSettings(settings: Settings) {
   void browser.storage.local.set<Partial<State>>({ settings });
@@ -21,6 +22,8 @@ setInterval(() => {
 }, 10000);
 
 onStoredStateChange((storedState) => {
+  HTML.classList.add(`${storedState.settings.prefersColorScheme}-theme`);
+
   try {
     ReactDOM.render(
       <FatalErrorWrapper state={storedState}>

@@ -1,7 +1,8 @@
 @import "colors";
 
 header {
-  background-color: $color-header;
+  background-color: #6facde;
+  color: #ffffff; // OMV, regardless of the theme, uses the same style for the header
   flex-shrink: 0;
   white-space: nowrap;
   display: flex;

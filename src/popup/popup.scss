@@ -80,8 +80,8 @@
   .backdrop {
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    filter: blur 0.5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    filter: blur(0.5px);
   }
 
   .overlay-content {

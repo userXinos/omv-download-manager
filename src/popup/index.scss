@@ -1,6 +1,8 @@
 @import "fields";
 @import "colors";
+@import "themes";
 
+// [Sean Kelley]:
 // Weird stuff happens when the contents of the popup change the size of the actual popup's container.
 // In particular, stuff gets extra weird over some internal arbitrary height limit that Chrome has, an
 // the popup might end up with two scroll bars, which is pretty sad. Experimentally, 500px is below

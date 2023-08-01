@@ -4,12 +4,10 @@ $color-success: #63dd65;
 $color-loading: #6facde;
 $color-selected: $color-loading;
 $color-indeterminate: #888;
-$color-background: #303030;
+$color-background: var(--color-background);
 
-$color-text: #ffffff;
-$color-text-faded: #b4b4b4;
-
-$color-header: #6facde;
+$color-text: var(--color-text);
+$color-text-faded: var(--color-text-faded);
 
 .intent-error {
   color: $color-error;

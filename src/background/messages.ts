@@ -4,6 +4,7 @@ import { Message, MessageResponse, Result } from "../common/apis/messages";
 import { addDownloadTasksAndPoll, clearCachedTasks, pollTasks } from "./actions";
 import { BackgroundState, getMutableStateSingleton } from "./backgroundState";
 import type { DiscriminateUnion } from "../common/types";
+import { onStoredStateChange, State } from "../common/state";
 
 type MessageHandler<T extends Message, U extends Result[keyof Result]> = (
   m: T,
@@ -75,7 +76,14 @@ const MESSAGE_HANDLERS: MessageHandlers = {
       await clearCachedTasks();
     }
     // Always reset the session!
+
     await state.api.Auth.Logout();
+  },
+  "set-color-scheme": async ({ color }) => {
+    onStoredStateChange((state) => {
+      state.settings.prefersColorScheme = color;
+      void browser.storage.local.set<Partial<State>>({ settings: state.settings });
+    });
   },
 };
 

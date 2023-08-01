@@ -27,8 +27,11 @@ async function saveSettings(settings: Settings): Promise<boolean> {
 }
 
 const ELEMENT = document.getElementById("body")!;
+const HTML = document.getElementsByTagName("html")[0];
 
 onStoredStateChange((state) => {
+  HTML.classList.add(`${state.settings.prefersColorScheme}-theme`);
+
   ReactDOM.render(
     <SettingsForm
       extensionState={state}
