@@ -1,14 +1,11 @@
 .task-filter-settings-form {
-  margin-bottom: 13px;
-
   .badge-display-type,
   .task-sort-type {
     display: flex;
     align-items: center;
-    margin-left: 15px;
 
     .label {
-      margin-right: 6px;
+      margin-right: 4px;
     }
 
     select {
@@ -18,6 +15,6 @@
   }
 
   .badge-display-type {
-    margin-top: 8px;
+    margin-top: 6px;
   }
 }

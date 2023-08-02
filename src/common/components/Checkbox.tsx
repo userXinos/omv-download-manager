@@ -9,12 +9,12 @@ export interface Props {
   title?: string;
 }
 
-export function SettingsListCheckbox(props: Props) {
+export function Checkbox(props: Props) {
   const id = useStableId("checkbox-id-");
   return (
-    <li title={props.title}>
+    <React.Fragment>
       <input id={id} type="checkbox" checked={props.checked} onChange={props.onChange} />
       <label htmlFor={id}>{props.label}</label>
-    </li>
+    </React.Fragment>
   );
 }
