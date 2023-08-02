@@ -332,10 +332,6 @@
     "message": "连接设置",
     "description": "Header for settings section."
   },
-  "Please_note_that_QuickConnect_IDs_and_twofactor_authentication_are_not_currently_supported": {
-    "message": "请注意：“QuickConnect ID” 和 “2步骤认证” 目前尚未支持",
-    "description": "Subheader for Connection settings section."
-  },
   "hostname_or_IP_address": {
     "message": "DSM域名或IP地址",
     "description": "Placeholder for settings input field."

@@ -20,6 +20,7 @@ export type BadgeDisplayType = "total" | "filtered" | "completed";
 export interface Settings extends OmitStrict<Settings_6, "badgeDisplayType"> {
   badgeDisplayType: BadgeDisplayType;
   showInactiveTasks: boolean;
+  prefersColorScheme: 'dark'|'light'
 }
 
 export interface State extends StateVersion, OmitStrict<State_6, "settings" | "stateVersion"> {
@@ -33,6 +34,7 @@ export function migrate(state: State_6): State {
     settings: {
       ...state.settings,
       showInactiveTasks: true,
+      prefersColorScheme: 'dark'
     },
   };
 }

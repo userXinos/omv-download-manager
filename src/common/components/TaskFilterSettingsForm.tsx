@@ -11,7 +11,7 @@ import {
 } from "../state";
 import { recordKeys } from "../lang";
 import { SettingsList } from "./SettingsList";
-import { SettingsListCheckbox } from "./SettingsListCheckbox";
+import { Checkbox } from "./Checkbox";
 
 export interface Props {
   visibleTasks: VisibleTaskSettings;
@@ -29,7 +29,7 @@ export function TaskFilterSettingsForm(props: Props) {
     <div className="task-filter-settings-form">
       <SettingsList>
         {recordKeys(ORDERED_VISIBLE_TASK_TYPE_NAMES).map((type) => (
-          <SettingsListCheckbox
+          <Checkbox
             key={type}
             checked={props.visibleTasks[type]}
             onChange={() => {
@@ -70,7 +70,7 @@ export function TaskFilterSettingsForm(props: Props) {
         </select>
       </div>
       <SettingsList>
-        <SettingsListCheckbox
+        <Checkbox
           checked={props.showInactiveTasks}
           onChange={() => {
             props.updateShowInactiveTasks(!props.showInactiveTasks);

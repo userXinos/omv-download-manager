@@ -10,6 +10,7 @@ export const SETTING_NAMES = typesafeUnionMembers<keyof Settings>({
   shouldHandleDownloadLinks: true,
   badgeDisplayType: true,
   showInactiveTasks: true,
+  prefersColorScheme: true,
 });
 
 const ALL_STORED_STATE_NAMES = typesafeUnionMembers<keyof State>({

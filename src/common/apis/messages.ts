@@ -1,5 +1,6 @@
 import type { DiscriminateUnion, OmitStrict } from "../types";
 import type { ShareMgmtFolder } from "./OpenMediaVault/ShareMgmt/Folders";
+import type { Settings } from "../state";
 
 export interface SuccessMessageResponse<T> {
   success: true;
@@ -60,13 +61,19 @@ export interface SetLoginPassword {
   password: string;
 }
 
+export interface SetColorScheme {
+  type: "set-color-scheme";
+  color: Settings["prefersColorScheme"];
+}
+
 export type Message =
   | AddTasks
   | PollTasks
   | StartTask
   | DeleteTasks
   | ListDirectories
-  | SetLoginPassword;
+  | SetLoginPassword
+  | SetColorScheme;
 
 const MESSAGE_TYPES: Record<Message["type"], true> = {
   "add-tasks": true,
@@ -75,6 +82,7 @@ const MESSAGE_TYPES: Record<Message["type"], true> = {
   "start-task": true,
   "list-directories": true,
   "set-login-password": true,
+  "set-color-scheme": true,
 };
 
 export const Message = {
@@ -92,6 +100,7 @@ export type Result = {
   "delete-tasks": MessageResponse;
   "list-directories": MessageResponse<ShareMgmtFolder[]>;
   "set-login-password": void;
+  "set-color-scheme": void;
 };
 
 function makeMessageOperations<T extends Message["type"], U extends any[]>(
@@ -130,6 +139,11 @@ export const ListDirectories = makeMessageOperations("list-directories");
 export const SetLoginPassword = makeMessageOperations("set-login-password", (password: string) => ({
   password,
 }));
+
+export const SetColorScheme = makeMessageOperations(
+  "set-color-scheme",
+  (color: SetColorScheme["color"]) => ({ color }),
+);
 
 {
   // [Sean Kelley]:

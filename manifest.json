@@ -40,7 +40,8 @@
     }
   },
   "options_ui": {
-    "page": "html/settings.html"
+    "page": "html/settings.html",
+    "chrome_style": true
   },
   "icons": {
     "16": "icons/icon-16.png",

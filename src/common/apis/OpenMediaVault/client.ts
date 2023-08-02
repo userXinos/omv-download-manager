@@ -2,6 +2,7 @@ import { typesafeUnionMembers } from "../../lang";
 import { Auth, AuthLoginResponse } from "./Auth";
 import { DownloaderPlugin } from "./DownloaderPlugin";
 import { ShareMgmt } from "./ShareMgmt";
+import { WebGui } from "./WebGui";
 import {
   RpcResponse,
   RpcFailureResponse,
@@ -10,6 +11,7 @@ import {
   TimeoutError,
   NetworkError,
 } from "./shared";
+import { SetColorScheme } from "../messages";
 
 export interface OMVClientSettings {
   baseUrl: string;
@@ -98,6 +100,14 @@ export class OMVClient {
     }
   }
 
+  private async updateUserSettings(baseUrl: string) {
+    const response = await WebGui.LocalStorage.get(baseUrl);
+
+    if (response.success) {
+      void (await SetColorScheme.send(response.data["prefers-color-scheme"]));
+    }
+  }
+
   private maybeLogin = async (request?: BaseRequest) => {
     const settings = this.getValidatedSettings();
     if (isConnectionFailure(settings)) {
@@ -107,7 +117,14 @@ export class OMVClient {
       this.loginPromise = Auth.Login(baseUrl, {
         ...request,
         ...restSettings,
-      }).catch((e) => ConnectionFailure.from(e));
+      })
+        .then((e) => {
+          if (e.success) {
+            void this.updateUserSettings(this.settings.baseUrl as string);
+          }
+          return e;
+        })
+        .catch((e) => ConnectionFailure.from(e));
     }
 
     return this.loginPromise;

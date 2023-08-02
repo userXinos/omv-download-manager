@@ -1,11 +1,20 @@
 ul.settings-list {
   list-style: none;
-  padding-left: 15px;
+  padding: 0;
 
   li {
-    margin: 5px auto;
+    margin: 5px 0;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
+
+    > *:not(input[type="checkbox"]) {
+      flex: 4;
+      display: inherit;
+    }
+
+    > span.label {
+      flex: 2;
+    }
   }
 }

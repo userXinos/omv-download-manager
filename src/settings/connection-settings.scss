@@ -1,5 +1,16 @@
 .connection-settings {
-  .remember-me input {
-    margin-left: auto;
+  .input-center {
+    display: flex;
+    align-items: center;
+  }
+
+  .port-setting {
+    max-width: 70px;
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: end;
   }
 }

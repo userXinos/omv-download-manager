@@ -1,4 +1,4 @@
-import "./index.scss";
+import "webext-base-css";
 import "../common/init/nonContentContext";
 import * as React from "react";
 import * as ReactDOM from "react-dom";

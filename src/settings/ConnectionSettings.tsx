@@ -50,9 +50,9 @@ export class ConnectionSettings extends React.PureComponent<Props, State> {
         className="connection-settings"
       >
         <SettingsList>
-          <li className="label-and-input host-settings">
+          <React.Fragment>
             <span className="label">{browser.i18n.getMessage("Host")}</span>
-            <div className="input">
+            <div className="input-center">
               <span>https://</span>
               <input
                 type="text"
@@ -76,11 +76,10 @@ export class ConnectionSettings extends React.PureComponent<Props, State> {
                 ref={kludgeRefSetClassname("port-setting")}
               />
             </div>
-          </li>
-
-          <li className="label-and-input">
+          </React.Fragment>
+          <React.Fragment>
             <span className="label">{browser.i18n.getMessage("Username")}</span>
-            <div className="input">
+            <div>
               <input
                 type="text"
                 {...disabledPropAndClassName(!canEditFields)}
@@ -90,11 +89,10 @@ export class ConnectionSettings extends React.PureComponent<Props, State> {
                 }}
               />
             </div>
-          </li>
-
-          <li className="label-and-input">
+          </React.Fragment>
+          <React.Fragment>
             <span className="label">{browser.i18n.getMessage("Password")}</span>
-            <div className="input">
+            <div>
               <input
                 type="password"
                 {...disabledPropAndClassName(!canEditFields)}
@@ -104,41 +102,43 @@ export class ConnectionSettings extends React.PureComponent<Props, State> {
                 }}
               />
             </div>
-          </li>
-
-          <li className="label-and-input remember-me">
-            <input
-              type="checkbox"
-              {...disabledPropAndClassName(!canEditFields)}
-              id={checkboxId}
-              checked={mergedSettings.rememberPassword}
-              onChange={() => {
-                this.setSetting("rememberPassword", !mergedSettings.rememberPassword);
-              }}
-            />
-            <label htmlFor={checkboxId}>{browser.i18n.getMessage("Remember_Password")}</label>
-          </li>
-
-          <li>
-            <LoginStatus status={this.state.loginStatus} />
-            <button
-              type="submit"
-              {...disabledPropAndClassName(
-                !canEditFields ||
-                  !mergedSettings.hostname ||
-                  !mergedSettings.port ||
-                  !mergedSettings.username ||
-                  !mergedSettings.password ||
-                  this.state.loginStatus === "in-progress" ||
-                  (this.state.loginStatus !== "none" &&
-                    !ClientRequestResult.isConnectionFailure(this.state.loginStatus) &&
-                    this.state.loginStatus.success),
-              )}
-            >
-              {browser.i18n.getMessage("Login")}
-            </button>
-          </li>
+          </React.Fragment>
+          <React.Fragment>
+            <span className="label" />
+            <div className="input-center">
+              <input
+                type="checkbox"
+                {...disabledPropAndClassName(!canEditFields)}
+                id={checkboxId}
+                checked={mergedSettings.rememberPassword}
+                onChange={() => {
+                  this.setSetting("rememberPassword", !mergedSettings.rememberPassword);
+                }}
+              />
+              <label htmlFor={checkboxId}>{browser.i18n.getMessage("Remember_Password")}</label>
+            </div>
+          </React.Fragment>
         </SettingsList>
+
+        <div className="footer">
+          <LoginStatus status={this.state.loginStatus} />
+          <button
+            type="submit"
+            {...disabledPropAndClassName(
+              !canEditFields ||
+                !mergedSettings.hostname ||
+                !mergedSettings.port ||
+                !mergedSettings.username ||
+                !mergedSettings.password ||
+                this.state.loginStatus === "in-progress" ||
+                (this.state.loginStatus !== "none" &&
+                  !ClientRequestResult.isConnectionFailure(this.state.loginStatus) &&
+                  this.state.loginStatus.success),
+            )}
+          >
+            {browser.i18n.getMessage("Login")}
+          </button>
+        </div>
       </form>
     );
   }

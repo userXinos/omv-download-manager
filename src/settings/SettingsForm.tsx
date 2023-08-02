@@ -13,12 +13,11 @@ import {
   ConnectionSettings,
 } from "../common/state";
 import { BUG_REPORT_URL } from "../common/constants";
-import { DOWNLOAD_ONLY_PROTOCOLS } from "../common/apis/protocols";
 import { TaskFilterSettingsForm } from "../common/components/TaskFilterSettingsForm";
 import { SettingsList } from "../common/components/SettingsList";
-import { SettingsListCheckbox } from "../common/components/SettingsListCheckbox";
+import { Checkbox } from "../common/components/Checkbox";
 import { ConnectionSettings as ConnectionSettingsComponent } from "./ConnectionSettings";
-import { disabledPropAndClassName, kludgeRefSetClassname } from "../common/classnameUtil";
+import { disabledPropAndClassName } from "../common/classnameUtil";
 import { typesafePick } from "../common/lang";
 import { SetLoginPassword } from "../common/apis/messages";
 import type { Overwrite } from "../common/types";
@@ -62,11 +61,6 @@ export class SettingsForm extends React.PureComponent<Props, State> {
 
         <header>
           <h3>{browser.i18n.getMessage("Connection")}</h3>
-          <p>
-            {browser.i18n.getMessage(
-              "Please_note_that_QuickConnect_IDs_and_twofactor_authentication_are_not_currently_supported",
-            )}
-          </p>
         </header>
 
         <ConnectionSettingsComponent
@@ -99,7 +93,7 @@ export class SettingsForm extends React.PureComponent<Props, State> {
         </header>
 
         <SettingsList>
-          <SettingsListCheckbox
+          <Checkbox
             checked={this.props.extensionState.settings.notifications.enableFeedbackNotifications}
             onChange={() => {
               this.setNotificationSetting(
@@ -109,7 +103,7 @@ export class SettingsForm extends React.PureComponent<Props, State> {
             }}
             label={browser.i18n.getMessage("Notify_when_adding_downloads")}
           />
-          <SettingsListCheckbox
+          <Checkbox
             checked={this.props.extensionState.settings.notifications.enableCompletionNotifications}
             onChange={() => {
               this.setNotificationSetting(
@@ -120,46 +114,51 @@ export class SettingsForm extends React.PureComponent<Props, State> {
             label={browser.i18n.getMessage("Notify_when_downloads_complete")}
           />
 
-          <li>
-            <span className="indent">
+          <React.Fragment>
+            <span className="label">
               {browser.i18n.getMessage("Check_for_completed_downloads_every")}
             </span>
-            <input
-              type="number"
-              {...disabledPropAndClassName(
-                !this.props.extensionState.settings.notifications.enableCompletionNotifications,
-              )}
-              min={POLL_MIN_INTERVAL}
-              step={POLL_STEP}
-              value={this.state.rawPollingInterval}
-              ref={kludgeRefSetClassname("polling-interval")}
-              onChange={(e) => {
-                const rawPollingInterval = e.currentTarget.value;
-                this.setState({ rawPollingInterval });
-                if (isValidPollingInterval(rawPollingInterval)) {
-                  this.setNotificationSetting("completionPollingInterval", +rawPollingInterval);
-                }
-              }}
-            />
-            {browser.i18n.getMessage("seconds")}
-            {isValidPollingInterval(this.state.rawPollingInterval) ? undefined : (
-              <span className="intent-error wrong-polling-interval">
-                {browser.i18n.getMessage("at_least_15")}
-              </span>
-            )}
-          </li>
 
-          <SettingsListCheckbox
-            checked={this.props.extensionState.settings.shouldHandleDownloadLinks}
-            onChange={() => {
-              this.setShouldHandleDownloadLinks(
-                !this.props.extensionState.settings.shouldHandleDownloadLinks,
-              );
-            }}
-            label={browser.i18n.getMessage("Handle_opening_downloadable_link_types_ZprotocolsZ", [
-              DOWNLOAD_ONLY_PROTOCOLS.join(", "),
-            ])}
-          />
+            <div className="input-polling-interval">
+              <input
+                type="number"
+                {...disabledPropAndClassName(
+                  !this.props.extensionState.settings.notifications.enableCompletionNotifications,
+                )}
+                min={POLL_MIN_INTERVAL}
+                step={POLL_STEP}
+                value={this.state.rawPollingInterval}
+                onChange={(e) => {
+                  const rawPollingInterval = e.currentTarget.value;
+                  this.setState({ rawPollingInterval });
+                  if (isValidPollingInterval(rawPollingInterval)) {
+                    this.setNotificationSetting("completionPollingInterval", +rawPollingInterval);
+                  }
+                }}
+              />
+              <span>{browser.i18n.getMessage("seconds")}</span>
+            </div>
+          </React.Fragment>
+          <React.Fragment>
+            <span className="label" />
+            <div className="wrong-polling-interval">
+              {isValidPollingInterval(this.state.rawPollingInterval) ? undefined : (
+                <span className="intent-error">{browser.i18n.getMessage("at_least_15")}</span>
+              )}
+            </div>
+          </React.Fragment>
+
+          {/*  /!*  <SettingsListCheckbox*!/*/}
+          {/*  /!*    checked={this.props.extensionState.settings.shouldHandleDownloadLinks}*!/*/}
+          {/*  /!*    onChange={() => {*!/*/}
+          {/*  /!*      this.setShouldHandleDownloadLinks(*!/*/}
+          {/*  /!*        !this.props.extensionState.settings.shouldHandleDownloadLinks,*!/*/}
+          {/*  /!*      );*!/*/}
+          {/*  /!*    }}*!/*/}
+          {/*  /!*    label={browser.i18n.getMessage("Handle_opening_downloadable_link_types_ZprotocolsZ", [*!/*/}
+          {/*  /!*      DOWNLOAD_ONLY_PROTOCOLS.join(", "),*!/*/}
+          {/*  /!*    ])}*!/*/}
+          {/*  /!*  />*!/*/}
         </SettingsList>
 
         {this.maybeRenderDebuggingOutputAndSeparator()}
@@ -191,7 +190,7 @@ export class SettingsForm extends React.PureComponent<Props, State> {
           </header>
 
           <SettingsList>
-            <li>
+            <React.Fragment>
               <textarea
                 className="debugging-output"
                 value={formattedDebugLogs}
@@ -200,13 +199,14 @@ export class SettingsForm extends React.PureComponent<Props, State> {
                   e.currentTarget.select();
                 }}
               />
-            </li>
+            </React.Fragment>
 
-            <li>
+            <React.Fragment>
+              <span className="label" />
               <button onClick={this.props.clearError}>
                 {browser.i18n.getMessage("Clear_output")}
               </button>
-            </li>
+            </React.Fragment>
           </SettingsList>
         </>
       );
@@ -259,11 +259,11 @@ export class SettingsForm extends React.PureComponent<Props, State> {
     });
   }
 
-  private setShouldHandleDownloadLinks(shouldHandleDownloadLinks: boolean) {
-    void this.saveSettings({
-      shouldHandleDownloadLinks,
-    });
-  }
+  // private setShouldHandleDownloadLinks(shouldHandleDownloadLinks: boolean) {
+  //   void this.saveSettings({
+  //     shouldHandleDownloadLinks,
+  //   });
+  // }
 
   private saveSettings = async (settings: Partial<Settings>) => {
     const success = await this.props.saveSettings({
